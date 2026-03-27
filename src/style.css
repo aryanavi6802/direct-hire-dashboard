@@ -1472,6 +1472,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   height: 100vh;
   overflow-y: auto;
   width: 280px;
+  padding: 0 16px;   /* single source of horizontal spacing for ALL children */
 }
 .jb-sidebar::-webkit-scrollbar { display: none; }
 
@@ -1480,21 +1481,21 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   display: flex;
   align-items: center;
   height: 75px;
-  padding: 24px 16px;
+  padding: 24px 0;   /* horizontal handled by sidebar */
   flex-shrink: 0;
 }
 
-/* Nav lists — 16px uniform horizontal padding across all sidebar sections */
+/* Nav lists */
 .jb-nav {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: 0 16px;
+  padding: 0;        /* horizontal handled by sidebar */
   flex: 1;
 }
 .jb-nav--bottom {
   flex: 0;
-  padding: 0 16px 16px;
+  padding: 0 0 16px; /* horizontal handled by sidebar */
   margin-top: auto;
 }
 
@@ -1513,8 +1514,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .jb-nav-item:hover { background: var(--color-bg-neutral); }
 .jb-nav-item.is-active {
-  background: var(--color-text-default);
-  color: var(--color-text-white);
+  background: var(--palette-bg-light);
+  color: var(--color-text-default);
 }
 
 /* Font variants matching Figma */
@@ -1591,7 +1592,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   grid-template-columns: minmax(0, 1fr) var(--jb-right-panel-width);
   flex: 1;
   min-height: 0;
-  margin: 0 0 0 12px;
+  margin: 0;
   background: var(--color-bg);
   border-radius: 16px 0 0 0;
   overflow: hidden;
@@ -1630,43 +1631,129 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Tabs — independent pills */
 .jb-tab-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px var(--space-6);
+  padding: 14px var(--space-4);
 }
 .jb-seg {
-  display: inline-flex; align-items: center;
-  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px;
+  border-radius: var(--radius-full);
+  background: #f4f4f5;
 }
 .jb-seg-item {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 16px;
-  font-family: var(--font-heading); font-size: 13px; font-weight: 600;
-  color: var(--color-text-second-2);
-  background: none;
-  border: 1.5px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: auto;
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: #525558;
+  background: #ffffff;
+  border: 0;
   border-radius: var(--radius-full);
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, border-color 0.18s;
+  transition: background var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing);
   white-space: nowrap;
 }
 .jb-seg-item:hover {
-  background: var(--color-bg);
-  color: var(--color-text-default);
+  background: #ffffff;
 }
 .jb-seg-item.is-active {
-  background: var(--color-text-default);
-  color: var(--color-text-white);
-  border-color: var(--color-text-default);
+  background: #b0f809;
+  color: #151614;
 }
 .jb-seg-n {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 1px 6px;
-  background: rgba(255,255,255,0.2); color: var(--color-text-white);
-  font-size: 11px; font-weight: 700;
+  background: #f4f4f5;
+  color: #525558;
+  font-size: 10px;
+  font-weight: 700;
   border-radius: var(--radius-full);
   line-height: 1.4;
 }
-.jb-seg-item:not(.is-active) .jb-seg-n {
-  background: var(--color-bg); color: var(--color-text-second-2);
+.jb-seg-item.is-active .jb-seg-n {
+  background: rgba(21, 22, 20, 0.12);
+  color: #151614;
+}
+
+.jb-seg-item,
+.jb-search-clear,
+.jb-fpill,
+.jb-fdrop,
+.jb-panel-item,
+.jb-panel-check-row,
+.jb-loc-inline-chip-x,
+.jb-loc-searchbox-clear,
+.jb-loc-result-row,
+.jb-loc-qpill,
+.jb-panel-reset,
+.jb-panel-confirm,
+.jb-top-avatar,
+.aa-cp-upgrade,
+.aa-cp-usage,
+.aa-toggle,
+.aa-alert-cta,
+.cm-close,
+.cm-regen,
+.cm-copy,
+.jsq-post-card-btn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.jb-seg-item:focus-visible,
+.jb-search-clear:focus-visible,
+.jb-fpill:focus-visible,
+.jb-fdrop:focus-visible,
+.jb-panel-item:focus-visible,
+.jb-panel-check-row:focus-visible,
+.jb-loc-inline-chip-x:focus-visible,
+.jb-loc-searchbox-clear:focus-visible,
+.jb-loc-result-row:focus-visible,
+.jb-loc-qpill:focus-visible,
+.jb-panel-reset:focus-visible,
+.jb-panel-confirm:focus-visible,
+.jb-top-avatar:focus-visible,
+.aa-cp-upgrade:focus-visible,
+.aa-cp-usage:focus-visible,
+.aa-toggle:focus-visible,
+.aa-alert-cta:focus-visible,
+.cm-close:focus-visible,
+.cm-regen:focus-visible,
+.cm-copy:focus-visible,
+.jsq-post-card-btn:focus-visible {
+  box-shadow: var(--btn-focus-ring);
+}
+
+.jb-seg-item:disabled,
+.jb-search-clear:disabled,
+.jb-fpill:disabled,
+.jb-fdrop:disabled,
+.jb-panel-item:disabled,
+.jb-panel-check-row:disabled,
+.jb-loc-inline-chip-x:disabled,
+.jb-loc-searchbox-clear:disabled,
+.jb-loc-result-row:disabled,
+.jb-loc-qpill:disabled,
+.jb-panel-reset:disabled,
+.jb-panel-confirm:disabled,
+.jb-top-avatar:disabled,
+.aa-cp-upgrade:disabled,
+.aa-cp-usage:disabled,
+.aa-toggle:disabled,
+.aa-alert-cta:disabled,
+.cm-close:disabled,
+.cm-regen:disabled,
+.cm-copy:disabled,
+.jsq-post-card-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 /* Filters */
@@ -1734,11 +1821,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Clear button */
 .jb-search-clear {
   display: flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; flex-shrink: 0;
+  width: var(--btn-height-s); height: var(--btn-height-s); flex-shrink: 0;
   border: none; background: var(--color-border-default);
   border-radius: 50%; cursor: pointer;
   color: var(--color-text-second-2);
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing);
   padding: 0;
 }
 .jb-search-clear:hover { background: var(--color-ui-border); color: var(--color-text-default); }
@@ -1755,37 +1842,67 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Quick-toggle pills */
 .jb-fpill {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 14px;
+  min-height: var(--btn-height-l);
+  padding: 0 var(--btn-px-m);
   background: var(--color-surface); color: var(--color-text-second);
-  font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  font-family: var(--font-body); font-size: var(--btn-font-size-m); font-weight: 500;
   border-radius: var(--radius-full); border: none; cursor: pointer; flex-shrink: 0;
-  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  transition: background var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing), box-shadow var(--btn-duration) var(--btn-easing);
 }
 .jb-fpill:hover { background: var(--color-bg); color: var(--color-text-default); }
 .jb-fpill.is-active { background: var(--color-text-default); color: var(--color-text-white); box-shadow: 0 2px 8px rgba(0,0,0,0.14); }
 
 /* Work mode — colour-matched to card badges */
-.jb-fpill--remote               { background: var(--color-surface); color: #16a34a; font-weight: 600; }
+.jb-fpill--remote               { background: var(--color-surface); color: var(--color-remote); font-weight: 600; }
 .jb-fpill--remote:hover         { background: var(--color-remote-bg); }
 .jb-fpill--remote.is-on         { background: var(--color-remote); color: var(--color-text-white); }
 .jb-fpill--remote.is-on:hover   { background: var(--color-remote-hover); }
 
-.jb-fpill--hybrid               { background: var(--color-surface); color: #2563eb; font-weight: 600; }
+.jb-fpill--hybrid               { background: var(--color-surface); color: var(--color-hybrid); font-weight: 600; }
 .jb-fpill--hybrid:hover         { background: var(--color-hybrid-bg); }
 .jb-fpill--hybrid.is-on         { background: var(--color-hybrid); color: var(--color-text-white); }
 .jb-fpill--hybrid.is-on:hover   { background: var(--color-hybrid-hover); }
 
-.jb-fpill--onsite               { background: var(--color-surface); color: #d97706; font-weight: 600; }
+.jb-fpill--onsite               { background: var(--color-surface); color: var(--color-onsite); font-weight: 600; }
 .jb-fpill--onsite:hover         { background: var(--color-onsite-bg); }
 .jb-fpill--onsite.is-on         { background: var(--color-onsite); color: var(--color-text-white); }
 .jb-fpill--onsite.is-on:hover   { background: var(--color-onsite-hover); }
 
-/* Saved — rose tint */
-.jb-fpill--saved        { background: var(--color-saved-pill-bg); color: var(--color-saved-pill); font-weight: 600; }
-.jb-fpill--saved:hover  { background: var(--color-saved-pill-hover); }
-.jb-fpill--saved svg    { stroke: var(--color-saved-pill); }
-.jb-fpill--saved.is-on  { background: var(--color-saved-pill); color: var(--color-text-white); }
-.jb-fpill--saved.is-on svg { stroke: var(--color-text-white); }
+/* Saved — neutral style */
+.jb-fpill--saved        { background: var(--color-surface); color: var(--color-text-second); font-weight: 600; }
+.jb-fpill--saved:hover  { background: var(--color-bg); color: var(--color-text-default); }
+.jb-fpill--saved svg    { stroke: currentColor; }
+.jb-fpill--saved.is-on  { background: var(--color-text-default); color: var(--color-text-white); }
+.jb-fpill--saved.is-on svg { stroke: currentColor; }
+
+/* Job Square source pills */
+.jb-fpill--linkedin,
+.jb-fpill--platform {
+  background: var(--color-surface);
+  color: var(--color-text-second);
+  font-weight: 600;
+}
+.jb-fpill--linkedin:hover,
+.jb-fpill--platform:hover {
+  background: var(--color-bg);
+  color: var(--color-text-default);
+}
+.jb-fpill--linkedin.is-on {
+  background: var(--color-linkedin);
+  color: var(--color-text-white);
+}
+.jb-fpill--linkedin.is-on:hover {
+  background: var(--color-linkedin);
+  opacity: 0.92;
+}
+.jb-fpill--platform.is-on {
+  background: var(--color-remote);
+  color: var(--color-text-white);
+}
+.jb-fpill--platform.is-on:hover {
+  background: var(--color-remote-hover);
+  opacity: 0.92;
+}
 
 .jb-credit-pill {
   display: inline-flex;
@@ -1837,21 +1954,21 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   color: var(--color-text-default);
 }
 
-/* Manual apply — amber tint */
-.jb-fpill--manual             { background: var(--color-surface); color: #b45309; font-weight: 600; }
-.jb-fpill--manual:hover       { background: var(--color-onsite-bg); }
-.jb-fpill--manual svg         { stroke: var(--color-onsite-hover); }
-.jb-fpill--manual.is-on       { background: var(--color-onsite); color: var(--color-text-white); }
-.jb-fpill--manual.is-on svg   { stroke: var(--color-text-white); }
-.jb-fpill--manual.is-on:hover { background: var(--color-onsite-hover); }
+/* Manual apply — hybrid blue tokens */
+.jb-fpill--manual             { background: var(--color-surface); color: var(--color-text-second); font-weight: 600; }
+.jb-fpill--manual:hover       { background: var(--color-bg); color: var(--color-text-default); }
+.jb-fpill--manual svg         { stroke: currentColor; }
+.jb-fpill--manual.is-on       { background: var(--color-hybrid); color: var(--color-text-white); }
+.jb-fpill--manual.is-on svg   { stroke: currentColor; }
+.jb-fpill--manual.is-on:hover { background: var(--color-hybrid-hover); }
 
-/* Referral — indigo tint */
-.jb-fpill--referral             { background: var(--color-surface); color: #4f46e5; font-weight: 600; }
-.jb-fpill--referral:hover       { background: var(--color-referral-bg); }
-.jb-fpill--referral svg         { stroke: var(--color-referral); }
-.jb-fpill--referral.is-on       { background: var(--color-referral); color: var(--color-text-white); }
-.jb-fpill--referral.is-on svg   { stroke: var(--color-text-white); }
-.jb-fpill--referral.is-on:hover { background: var(--color-referral-hover); }
+/* Referral — remote green tokens */
+.jb-fpill--referral             { background: var(--color-surface); color: var(--color-text-second); font-weight: 600; }
+.jb-fpill--referral:hover       { background: var(--color-bg); color: var(--color-text-default); }
+.jb-fpill--referral svg         { stroke: currentColor; }
+.jb-fpill--referral.is-on       { background: var(--color-remote); color: var(--color-text-white); }
+.jb-fpill--referral.is-on svg   { stroke: currentColor; }
+.jb-fpill--referral.is-on:hover { background: var(--color-remote-hover); }
 
 /* Sort segment */
 .jb-sort-seg {
@@ -1877,13 +1994,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Attribute dropdown buttons */
 .jb-fdrop {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 7px 14px;
+  min-height: var(--btn-height-l);
+  padding: 0 var(--btn-px-m);
   background: var(--color-surface); color: var(--color-text-second);
-  font-family: var(--font-body); font-size: 13px; font-weight: 500;
-  border-radius: var(--radius-full);
+  font-family: var(--font-body); font-size: var(--btn-font-size-m); font-weight: 500;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer; flex-shrink: 0;
-  transition: color 0.15s, background 0.15s, box-shadow 0.15s, border-color 0.15s;
+  transition: color var(--btn-duration) var(--btn-easing), background var(--btn-duration) var(--btn-easing), box-shadow var(--btn-duration) var(--btn-easing), border-color var(--btn-duration) var(--btn-easing);
 }
 .jb-fdrop:hover {
   color: var(--color-text-default);
@@ -1895,8 +2013,8 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .jb-fdrop.is-active.is-open { box-shadow: 0 0 0 2px var(--color-main-default); }
 .jb-fdrop--sort {
   white-space: nowrap;
-  height: 36px;
-  padding: 0 14px;
+  height: var(--btn-height-l);
+  padding: 0 var(--btn-px-m);
 }
 .jb-fdrop-count {
   background: var(--color-main-default); color: var(--color-text-default);
@@ -1934,10 +2052,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* List item (for sort) */
 .jb-panel-item {
   display: flex; align-items: center;
-  padding: 9px 12px; border-radius: 10px;
-  font-size: 14px; font-weight: 500; color: var(--color-text-second);
+  min-height: var(--btn-height-l);
+  padding: 0 var(--space-3); border-radius: 10px;
+  font-size: var(--btn-font-size-l); font-weight: 500; color: var(--color-text-second);
   background: none; border: none; cursor: pointer; text-align: left;
-  transition: background 0.12s, color 0.12s;
+  transition: background var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing);
 }
 .jb-panel-item:hover { background: var(--color-bg); color: var(--color-text-default); }
 .jb-panel-item.is-selected {
@@ -1947,10 +2066,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Checkbox row */
 .jb-panel-check-row {
   display: flex; align-items: center; gap: 11px;
-  padding: 9px 4px; border-radius: 8px;
-  font-size: 14px; font-weight: 500; color: var(--color-text-default);
+  min-height: var(--btn-height-l);
+  padding: 0 var(--space-1); border-radius: 8px;
+  font-size: var(--btn-font-size-l); font-weight: 500; color: var(--color-text-default);
   background: none; border: none; cursor: pointer; text-align: left;
-  transition: background 0.12s;
+  transition: background var(--btn-duration) var(--btn-easing);
   width: 100%;
 }
 .jb-panel-check-row:hover { background: var(--color-bg); }
@@ -2014,7 +2134,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   display: flex; align-items: center; justify-content: center;
   width: 16px; height: 16px; border-radius: 50%;
   background: none; color: var(--color-text-second-2);
-  transition: background 0.1s;
+  transition: background var(--btn-duration) var(--btn-easing);
 }
 .jb-loc-inline-chip-x:hover { background: var(--color-ui-placeholder); }
 
@@ -2030,9 +2150,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* Clear button */
 .jb-loc-searchbox-clear {
   display: flex; align-items: center; justify-content: center;
-  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  width: var(--btn-height-s); height: var(--btn-height-s); border-radius: 50%; flex-shrink: 0;
   background: var(--color-ui-border); color: var(--color-text-second-2);
-  transition: background 0.12s;
+  transition: background var(--btn-duration) var(--btn-easing);
 }
 .jb-loc-searchbox-clear:hover { background: var(--color-ui-border-focus); }
 
@@ -2049,10 +2169,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .jb-loc-dropdown::-webkit-scrollbar-thumb { background: var(--color-ui-border); border-radius: 2px; }
 .jb-loc-result-row {
   display: flex; align-items: center; gap: 8px;
-  width: 100%; padding: 9px 12px;
-  font-size: 13px; font-weight: 500; color: var(--color-text-second);
+  width: 100%;
+  min-height: var(--btn-height-l);
+  padding: 0 var(--space-3);
+  font-size: var(--btn-font-size-m); font-weight: 500; color: var(--color-text-second);
   background: none; border: none; cursor: pointer; text-align: left;
-  transition: background 0.1s, color 0.1s;
+  transition: background var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing);
 }
 .jb-loc-result-row:first-child { border-radius: 10px 10px 0 0; }
 .jb-loc-result-row:last-child  { border-radius: 0 0 10px 10px; }
@@ -2068,10 +2190,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   display: flex; flex-wrap: wrap; gap: 6px;
 }
 .jb-loc-qpill {
-  padding: 5px 11px; border-radius: var(--radius-full);
+  min-height: var(--btn-height-m);
+  padding: 0 11px; border-radius: var(--radius-full);
   background: var(--color-bg-neutral); border: 1px solid var(--color-border-default);
-  font-size: 12px; font-weight: 500; color: var(--color-text-second); cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  font-size: var(--btn-font-size-s); font-weight: 500; color: var(--color-text-second); cursor: pointer;
+  transition: background var(--btn-duration) var(--btn-easing), border-color var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing);
 }
 .jb-loc-qpill:hover { background: var(--color-border-default); color: var(--color-text-default); }
 .jb-loc-qpill.is-on {
@@ -2088,15 +2211,17 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .jb-panel-footer--single { justify-content: flex-end; border-top: none; margin-top: 8px; padding-top: 0; }
 .jb-panel-reset {
-  font-size: 13px; font-weight: 600; color: var(--color-text-second);
-  background: none; border: none; cursor: pointer; padding: 6px 0;
-  transition: color 0.15s;
+  min-height: var(--btn-height-m);
+  font-size: var(--btn-font-size-m); font-weight: 600; color: var(--color-text-second);
+  background: none; border: none; cursor: pointer; padding: 0;
+  transition: color var(--btn-duration) var(--btn-easing);
 }
 .jb-panel-reset:hover { color: var(--color-text-default); }
 .jb-panel-confirm {
-  font-size: 13px; font-weight: 700; color: var(--color-text-default);
-  background: none; border: none; cursor: pointer; padding: 6px 0;
-  transition: color 0.15s;
+  min-height: var(--btn-height-m);
+  font-size: var(--btn-font-size-m); font-weight: 700; color: var(--color-text-default);
+  background: none; border: none; cursor: pointer; padding: 0;
+  transition: color var(--btn-duration) var(--btn-easing);
 }
 .jb-panel-confirm:hover { color: var(--color-main-default); }
 
@@ -2121,7 +2246,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: 8px 12px 16px var(--space-4);
+  padding: 8px var(--space-4) 16px;
   scrollbar-width: none;
 }
 .jb-list-scroll::-webkit-scrollbar { display: none; }
@@ -2274,7 +2399,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   border: 1.5px solid var(--color-border-default);
   color: var(--color-text-second);
   font-family: var(--font-heading); font-size: 12px; font-weight: 600;
-  border-radius: var(--radius-full); cursor: pointer;
+  border-radius: var(--radius-md); cursor: pointer;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
   white-space: nowrap;
 }
@@ -2287,7 +2412,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   padding: 0 14px;
   background: var(--color-text-default); color: #ffffff;
   font-family: var(--font-heading); font-size: 12px; font-weight: 700;
-  border-radius: var(--radius-full); border: none; cursor: pointer;
+  border-radius: var(--radius-md); border: none; cursor: pointer;
   white-space: nowrap; position: relative; overflow: hidden;
   transition: transform 0.18s, box-shadow 0.18s;
 }
@@ -2308,7 +2433,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   padding: 0 14px;
   background: var(--color-remote-bg); color: var(--color-remote);
   font-family: var(--font-heading); font-size: 12px; font-weight: 700;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   white-space: nowrap; cursor: default;
 }
 .jb-applied-auto {
@@ -2411,11 +2536,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   color: var(--color-text-default);
 }
 .aa-cp-upgrade {
-  padding: 4px 12px;
+  min-height: var(--btn-height-m);
+  padding: 0 var(--space-3);
   background: var(--color-text-default); color: var(--color-text-white);
-  border: none; border-radius: var(--radius-full);
-  font-family: var(--font-heading); font-size: 11.5px; font-weight: 700;
-  cursor: pointer; transition: opacity 0.15s;
+  border: none; border-radius: var(--radius-md);
+  font-family: var(--font-heading); font-size: var(--btn-font-size-s); font-weight: 700;
+  cursor: pointer; transition: opacity var(--btn-duration) var(--btn-easing);
 }
 .aa-cp-upgrade:hover { opacity: 0.85; }
 .aa-cp-divider {
@@ -2438,11 +2564,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 .aa-cp-usage {
   display: flex; align-items: center; gap: 4px;
-  width: 100%; padding: var(--space-2) var(--space-4);
+  width: 100%;
+  min-height: var(--btn-height-l);
+  padding: 0 var(--space-4);
   background: none; border: none;
-  font-size: 12.5px; font-weight: 500; color: var(--color-text-second);
+  font-size: var(--btn-font-size-s); font-weight: 500; color: var(--color-text-second);
   cursor: pointer; text-align: left;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--btn-duration) var(--btn-easing), color var(--btn-duration) var(--btn-easing);
 }
 .aa-cp-usage:hover {
   background: var(--color-bg);
@@ -2458,7 +2586,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   width: 42px; height: 24px; border-radius: 12px;
   background: var(--color-border-default);
   border: none; cursor: pointer; position: relative;
-  transition: background 0.22s;
+  transition: background var(--btn-duration) var(--btn-easing);
   flex-shrink: 0;
 }
 .aa-toggle.is-on { background: var(--color-text-default); }
@@ -2569,11 +2697,12 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .aa-alert-msg { flex: 1; line-height: 1.35; }
 .aa-alert-cta {
   flex-shrink: 0;
-  padding: 3px 10px;
+  min-height: var(--btn-height-m);
+  padding: 0 var(--space-3);
   background: var(--color-text-default); color: var(--color-text-white);
-  border: none; border-radius: var(--radius-full);
-  font-family: var(--font-heading); font-size: 11px; font-weight: 700;
-  cursor: pointer; transition: opacity 0.15s;
+  border: none; border-radius: var(--radius-md);
+  font-family: var(--font-heading); font-size: var(--btn-font-size-s); font-weight: 700;
+  cursor: pointer; transition: opacity var(--btn-duration) var(--btn-easing);
 }
 .aa-alert-cta:hover { opacity: 0.8; }
 
@@ -2643,7 +2772,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   font-size: 10px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
 }
 .aa-s--pending {
-  background: var(--color-warning-bg); color: var(--color-warning-text);
+  background: var(--color-secondary-color); color: var(--color-secondary-default);
   animation: aaPendingPulse 2s ease-in-out infinite;
 }
 .aa-s--applied {
@@ -2727,7 +2856,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   min-width: 88px;
   height: 30px;
   padding: 0 12px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   font-family: var(--font-heading); font-size: 12px; font-weight: 700;
   border: none; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
   white-space: nowrap;
@@ -2780,11 +2909,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .cm-manager-name { font-size: 14px; font-weight: 700; color: var(--color-text-default); }
 .cm-manager-title { font-size: 12px; color: var(--color-text-second-2); margin-top: 1px; }
 .cm-close {
-  width: 30px; height: 30px; border-radius: 50%;
+  width: var(--btn-height-m); height: var(--btn-height-m); border-radius: 50%;
   background: var(--color-bg-neutral); border: none; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   color: var(--color-text-second-2); flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background var(--btn-duration) var(--btn-easing);
 }
 .cm-close:hover { background: var(--color-border-default); }
 
@@ -2891,21 +3020,23 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .cm-footer-right { display: flex; align-items: center; gap: 8px; }
 .cm-regen {
   display: flex; align-items: center; gap: 5px;
-  font-size: 12px; font-weight: 500; color: var(--color-text-second-2);
-  background: none; border: none; cursor: pointer; padding: 2px 0;
-  transition: color 0.15s;
+  min-height: var(--btn-height-m);
+  font-size: var(--btn-font-size-s); font-weight: 500; color: var(--color-text-second-2);
+  background: none; border: none; cursor: pointer; padding: 0;
+  transition: color var(--btn-duration) var(--btn-easing);
 }
 .cm-regen svg { overflow: visible; flex-shrink: 0; }
 .cm-regen:hover:not(:disabled) { color: var(--color-text-default); }
 .cm-regen:disabled { opacity: 0.4; cursor: default; }
 .cm-copy {
   display: flex; align-items: center; gap: 5px;
-  font-size: 12px; font-weight: 500;
-  padding: 7px 13px; border-radius: var(--radius-full);
+  min-height: var(--btn-height-m);
+  font-size: var(--btn-font-size-s); font-weight: 500;
+  padding: 0 13px; border-radius: var(--radius-full);
   background: var(--color-bg-neutral);
   border: 1px solid var(--color-border-default);
   color: var(--color-text-default); cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background var(--btn-duration) var(--btn-easing), border-color var(--btn-duration) var(--btn-easing);
 }
 .cm-copy:hover:not(:disabled) { background: var(--color-border-default); }
 .cm-copy:disabled { opacity: 0.4; cursor: default; }
@@ -3043,10 +3174,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .jsq-post-card-desc { font-size: 11.5px; color: rgba(255,255,255,0.5); line-height: 1.5; }
 .jsq-post-card-btn {
   align-self: flex-start;
-  padding: 8px 18px; border: none; border-radius: var(--radius-full);
+  min-height: var(--btn-height-m);
+  padding: 0 18px; border: none; border-radius: var(--radius-full);
   background: var(--color-main-default); color: var(--color-text-default);
-  font-family: var(--font-heading); font-size: 12.5px; font-weight: 700;
-  cursor: pointer; transition: opacity 0.15s;
+  font-family: var(--font-heading); font-size: var(--btn-font-size-s); font-weight: 700;
+  cursor: pointer; transition: opacity var(--btn-duration) var(--btn-easing);
 }
 .jsq-post-card-btn:hover { opacity: 0.88; }
 

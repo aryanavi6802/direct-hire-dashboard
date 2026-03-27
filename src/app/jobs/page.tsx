@@ -1,14 +1,46 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import JobCard from '@/components/jobs/JobCard'
+import FloatingNovaChat from '@/components/FloatingNovaChat'
+import JobSquareCard from '@/components/jobs/JobSquareCard'
+import type { Job } from '@/components/jobs/types'
+import { SIGNAL_META, type JSItem } from '@/components/jobs/jobSquareTypes'
+import {
+  AlertCtaButton,
+  AutoApplyToggleButton,
+  ContactModalCloseButton,
+  ContactModalCopyButton,
+  ContactModalRegenButton,
+  FilterDropdownButton,
+  FilterPanelOptionButton,
+  HeaderTabButton,
+  JobSquarePostButton,
+  LocationChipRemoveButton,
+  LocationQuickPickButton,
+  LocationResultRowButton,
+  PanelConfirmButton,
+  PanelResetButton,
+  SavedJobsButton,
+  SearchClearButton,
+  SortPanelItemButton,
+  SourcePillButton,
+  TopAvatarButton,
+  TogglePillButton,
+  UpgradeButton,
+  UsageDetailButton
+} from '@/components/Buttons'
+import {
+  BriefcaseBusiness,
+  Bot,
+  CircleUserRound,
+  FileUser,
+  SlidersHorizontal,
+  HandCoins,
+  ChartNoAxesColumn,
+  Settings
+} from 'lucide-react'
 
 // ── Types ──────────────────────────────────────────────────────────
-type Job = {
-  id: number; match: number; posted: string; applicants: number
-  title: string; company: string; companyColor: string
-  location: string; workMode: 'On-site' | 'Remote' | 'Hybrid'
-  type: string; level: string; exp: string; salary: string
-  appliedDate: string | null; badges: string[]; saved: boolean; hot?: boolean
-}
 type AppStatus = 'pending' | 'applied'
 type AutoApp = {
   id: number; title: string; company: string; companyColor: string
@@ -31,25 +63,6 @@ const AUTO_APPS: AutoApp[] = [
   { id: 4, title: 'UI Engineer', company: 'Notion', companyColor: '#000000', status: 'applied', date: '15m ago', salary: '$110k–$140k' },
   { id: 5, title: 'Full Stack Dev', company: 'Railway', companyColor: '#7b2bf9', status: 'applied', date: '22m ago', salary: '$100k–$130k' },
 ]
-
-// ── Job Square types & data ─────────────────────────────────────────
-type SignalKind = 'founding' | 'hiring-fast' | 'new-team' | 'expansion'
-type JSSource  = 'linkedin' | 'platform'
-type JSItem = {
-  id: number; source: JSSource
-  manager: { name: string; title: string; initials: string; color: string }
-  company: string; companyInitials: string; companyColor: string
-  role: string
-  signal: { kind: SignalKind; label: string; sub: string }
-  location: string; salary: string; posted: string
-}
-
-const SIGNAL_META: Record<SignalKind, { emoji: string; bg: string; color: string }> = {
-  'founding':    { emoji: '⭐', bg: '#f3e8ff', color: '#7c3aed' },
-  'hiring-fast': { emoji: '⚡', bg: '#dcfce7', color: '#15803d' },
-  'new-team':    { emoji: '🟡', bg: '#fef9c3', color: '#a16207' },
-  'expansion':   { emoji: '🌱', bg: '#dcfce7', color: '#166534' },
-}
 
 const JOB_SQUARE: JSItem[] = [
   { id: 1, source: 'linkedin', manager: { name: 'Sarah Chen', title: 'Head of Engineering', initials: 'SC', color: '#ddd6fe' }, company: 'Agency AI', companyInitials: 'A', companyColor: '#7c3aed', role: 'Founding AI Engineer', signal: { kind: 'founding', label: 'Founding', sub: '$200K–$280K + Equity' }, location: 'Remote', salary: '$200K–$260K', posted: '2d ago' },
@@ -155,9 +168,7 @@ function ContactModal({ item, onClose }: { item: JSItem; onClose: () => void }) 
               <p className="cm-manager-title">{item.manager.title} · {item.company}</p>
             </div>
           </div>
-          <button className="cm-close" onClick={onClose} aria-label="Close">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
+          <ContactModalCloseButton onClick={onClose} />
         </div>
 
         {/* Job chip */}
@@ -185,18 +196,9 @@ function ContactModal({ item, onClose }: { item: JSItem; onClose: () => void }) 
 
         {/* Footer */}
         <div className="cm-footer">
-          <button className="cm-regen" onClick={() => setVariant(v => v + 1)} disabled={isTyping}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
-            Regenerate
-          </button>
+          <ContactModalRegenButton onClick={() => setVariant(v => v + 1)} disabled={isTyping} />
           <div className="cm-footer-right">
-            <button className="cm-copy" onClick={copy} disabled={isTyping}>
-              {copied ? (
-                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>Copied</>
-              ) : (
-                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</>
-              )}
-            </button>
+            <ContactModalCopyButton copied={copied} onClick={copy} disabled={isTyping} />
             <a
               className="cm-open"
               href={item.source === 'linkedin' ? 'https://linkedin.com' : '#'}
@@ -217,68 +219,6 @@ function ContactModal({ item, onClose }: { item: JSItem; onClose: () => void }) 
   )
 }
 
-function JobSquareCard({ item, onContact }: { item: JSItem; onContact: (item: JSItem) => void }) {
-  const sig = SIGNAL_META[item.signal.kind]
-  const isLinkedin = item.source === 'linkedin'
-  return (
-    <div className="js-card">
-      <div className="js-card-top">
-        {/* Manager */}
-        <div className="js-manager">
-          <div className="js-manager-av" style={{ background: item.manager.color }}>
-            {item.manager.initials}
-          </div>
-          <div className="js-manager-info">
-            <p className="js-manager-name">{item.manager.name}</p>
-            <p className="js-manager-title">{item.manager.title}</p>
-          </div>
-        </div>
-        {/* Signal */}
-        <div className="js-signal" style={{ background: sig.bg, color: sig.color }}>
-          <span>{sig.emoji}</span>
-          <span>{item.signal.label}</span>
-        </div>
-        {/* Meta */}
-        <span className="js-posted">{item.posted}</span>
-      </div>
-
-      <div className="js-card-mid">
-        <div className="js-job-info">
-          <p className="js-role">{item.role}</p>
-          <p className="js-company">{item.company} · {item.signal.sub}</p>
-        </div>
-      </div>
-
-      <div className="js-card-ft">
-        <div className="js-ft-meta">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span>{item.location}</span>
-        </div>
-        <div className="js-ft-actions">
-          {isLinkedin ? (
-            <button className="js-btn js-btn--linkedin" onClick={() => onContact(item)}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              Apply
-            </button>
-          ) : (
-            <button className="js-btn js-btn--contact" onClick={() => onContact(item)}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              Contact
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const SIGNALS = [
-  { key: 'founding',    label: 'Founding',    emoji: '⭐', count: 12, total: 57, color: '#7c3aed' },
-  { key: 'hiring-fast', label: 'Hiring Fast', emoji: '⚡', count: 8,  total: 57, color: '#059669' },
-  { key: 'new-team',    label: 'New Team',    emoji: '🟡', count: 15, total: 57, color: '#d97706' },
-  { key: 'expansion',   label: 'Expansion',   emoji: '🌱', count: 22, total: 57, color: '#16a34a' },
-]
-
 const TOP_COMPANIES = [
   { name: 'Anthropic',  initials: 'An', color: '#f97316', roles: 4, source: 'platform' },
   { name: 'Stripe',     initials: 'St', color: '#6366f1', roles: 3, source: 'platform' },
@@ -296,67 +236,52 @@ function JobSquarePanel() {
           <p className="jsq-post-card-title">Post your opening</p>
           <p className="jsq-post-card-desc">Reach 2.4K active candidates directly — no middleman.</p>
         </div>
-        <button className="jsq-post-card-btn">Post a Job →</button>
+        <JobSquarePostButton />
       </div>
 
       {/* Overview stats */}
-      <div className="jsq-hd">
-        <span className="jsq-hd-title">Market Pulse</span>
-        <span className="jsq-hd-sub">Updated 2h ago</span>
-      </div>
-      <div className="jsq-stats-row">
-        <div className="jsq-stat"><strong>57</strong><span>Jobs available</span></div>
-        <div className="jsq-stat"><strong>9</strong><span>New today</span></div>
-        <div className="jsq-stat"><strong>38%</strong><span>Direct contact</span></div>
-      </div>
-
-      {/* Signal breakdown */}
-      <div className="jsq-section">
-        <p className="jsq-section-title">Signal Breakdown</p>
-        <div className="jsq-signals">
-          {SIGNALS.map(s => (
-            <div key={s.key} className="jsq-signal-row">
-              <span className="jsq-signal-emoji">{s.emoji}</span>
-              <span className="jsq-signal-label">{s.label}</span>
-              <div className="jsq-signal-bar">
-                <div className="jsq-signal-fill" style={{ width: `${(s.count / s.total) * 100}%`, background: s.color + '33' }}>
-                  <div className="jsq-signal-fill-inner" style={{ background: s.color }} />
-                </div>
-              </div>
-              <span className="jsq-signal-count">{s.count}</span>
-            </div>
-          ))}
+      <div className="jsq-pulse-card">
+        <div className="jsq-hd">
+          <span className="jsq-hd-title">Market Pulse</span>
+          <span className="jsq-hd-sub">Updated 2h ago</span>
+        </div>
+        <div className="jsq-stats-row">
+          <div className="jsq-stat"><strong>57</strong><span>Jobs available</span></div>
+          <div className="jsq-stat"><strong>9</strong><span>New today</span></div>
+          <div className="jsq-stat"><strong>38%</strong><span>Direct contact</span></div>
         </div>
       </div>
 
-      {/* Top companies */}
-      <div className="jsq-section">
-        <p className="jsq-section-title">Actively Hiring</p>
-        <div className="jsq-companies">
-          {TOP_COMPANIES.map(c => (
-            <div key={c.name} className="jsq-company-row">
-              <span className="jsq-co-av" style={{ background: c.color + '22', color: c.color }}>{c.initials}</span>
-              <span className="jsq-co-name">{c.name}</span>
-              <span className="jsq-co-roles">{c.roles} role{c.roles > 1 ? 's' : ''}</span>
-              <span className={`jsq-co-src jsq-co-src--${c.source}`}>{c.source === 'linkedin' ? 'LinkedIn' : 'Platform'}</span>
+      <div className="jsq-content-card">
+        {/* Response time by source */}
+        <div className="jsq-section">
+          <p className="jsq-section-title">Avg. Response Time</p>
+          <div className="jsq-resp-row">
+            <div className="jsq-resp-item">
+              <span className="jsq-resp-src jsq-resp-src--platform">Platform</span>
+              <strong className="jsq-resp-val">~12h</strong>
+              <span className="jsq-resp-tag">Faster</span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Response time by source */}
-      <div className="jsq-section">
-        <p className="jsq-section-title">Avg. Response Time</p>
-        <div className="jsq-resp-row">
-          <div className="jsq-resp-item">
-            <span className="jsq-resp-src jsq-resp-src--platform">Platform</span>
-            <strong className="jsq-resp-val">~12h</strong>
-            <span className="jsq-resp-tag">Faster</span>
+            <div className="jsq-resp-divider" />
+            <div className="jsq-resp-item">
+              <span className="jsq-resp-src jsq-resp-src--linkedin">LinkedIn</span>
+              <strong className="jsq-resp-val">~48h</strong>
+            </div>
           </div>
-          <div className="jsq-resp-divider" />
-          <div className="jsq-resp-item">
-            <span className="jsq-resp-src jsq-resp-src--linkedin">LinkedIn</span>
-            <strong className="jsq-resp-val">~48h</strong>
+        </div>
+
+        {/* Top companies */}
+        <div className="jsq-section">
+          <p className="jsq-section-title">Most Popular Jobs</p>
+          <div className="jsq-companies">
+            {TOP_COMPANIES.map(c => (
+              <div key={c.name} className="jsq-company-row">
+                <span className="jsq-co-av" style={{ background: c.color + '22', color: c.color }}>{c.initials}</span>
+                <span className="jsq-co-name">{c.name}</span>
+                <span className="jsq-co-roles">{c.roles} role{c.roles > 1 ? 's' : ''}</span>
+                <span className={`jsq-co-src jsq-co-src--${c.source}`}>{c.source === 'linkedin' ? 'LinkedIn' : 'Platform'}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -366,54 +291,20 @@ function JobSquarePanel() {
 }
 
 // ── Figma icon assets (node 8-2884) ────────────────────────────────
-const FIG_LOGO      = 'https://www.figma.com/api/mcp/asset/9d629858-9234-493d-9671-3f1d3dec7396'
-const FIG_JOB_BODY  = 'https://www.figma.com/api/mcp/asset/f6b54cef-4b85-4d1c-a2e6-06e20ec36b97'
-const FIG_JOB_SIDE  = 'https://www.figma.com/api/mcp/asset/307b6c66-c311-444f-97ec-43f1351bd4f6'
-const FIG_JOB_TOP   = 'https://www.figma.com/api/mcp/asset/f34cd908-d94f-492c-aa5b-5b469aa0eb9e'
-const FIG_AUTO      = 'https://www.figma.com/api/mcp/asset/666eafec-9df9-4c81-be34-45bdb3411510'
-const FIG_PROF      = 'https://www.figma.com/api/mcp/asset/7187f84a-4368-4c89-bd4f-fa9562cc4491'
-const FIG_RESUME    = 'https://www.figma.com/api/mcp/asset/763ea0e6-86d1-4a07-8a09-580317b98e3c'
-const FIG_PREF      = 'https://www.figma.com/api/mcp/asset/7cca0475-9dd6-4e73-9ae6-be42e520dc43'
-const FIG_REFER     = 'https://www.figma.com/api/mcp/asset/8ff2bb3b-d3be-43c4-937b-43f3ca4ac9fc'
-const FIG_USAGE     = 'https://www.figma.com/api/mcp/asset/39e73a81-1258-4470-90b2-b6797b717114'
-const FIG_SET       = 'https://www.figma.com/api/mcp/asset/d3c93eac-1edc-4cb2-9341-ae7f9f2a3f98'
-
-// Jobs icon: 4-part composition matching Figma exactly
-const JobsIcon = () => (
-  <div style={{ position: 'relative', width: 16, height: 16, flexShrink: 0 }}>
-    <div style={{ position: 'absolute', top: '28.57%', right: '3.57%', bottom: '3.57%', left: '3.57%' }}>
-      <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src={FIG_JOB_BODY} />
-    </div>
-    <div style={{ position: 'absolute', top: '28.57%', right: '71.43%', bottom: '3.57%', left: '28.57%' }}>
-      <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src={FIG_JOB_SIDE} />
-    </div>
-    <div style={{ position: 'absolute', top: '28.57%', right: '28.57%', bottom: '3.57%', left: '71.43%' }}>
-      <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src={FIG_JOB_SIDE} />
-    </div>
-    <div style={{ position: 'absolute', top: '10.71%', right: '32.14%', bottom: '71.43%', left: '32.14%' }}>
-      <img alt="" style={{ display: 'block', width: '100%', height: '100%' }} src={FIG_JOB_TOP} />
-    </div>
-  </div>
-)
-
-const FigIcon = ({ src }: { src: string }) => (
-  <div style={{ position: 'relative', width: 16, height: 16, flexShrink: 0, overflow: 'hidden' }}>
-    <img alt="" style={{ position: 'absolute', inset: '-0.67%', display: 'block', width: '101.34%', height: '101.34%', objectFit: 'contain' }} src={src} />
-  </div>
-)
+const FIG_LOGO          = 'https://www.figma.com/api/mcp/asset/9d629858-9234-493d-9671-3f1d3dec7396'
 
 // ── Sidebar nav ────────────────────────────────────────────────────
 const NAV_MAIN = [
-  { label: 'Jobs',           active: true,  icon: <JobsIcon />,                fontClass: 'jb-nav-font-main' },
-  { label: 'Auto Apply',     active: false, icon: <FigIcon src={FIG_AUTO} />,  fontClass: 'jb-nav-font-main' },
-  { label: 'Profile',        active: false, icon: <FigIcon src={FIG_PROF} />,  fontClass: 'jb-nav-font-main' },
-  { label: 'Resume',         active: false, icon: <FigIcon src={FIG_RESUME} />,fontClass: 'jb-nav-font-main' },
-  { label: 'Job Preference', active: false, icon: <FigIcon src={FIG_PREF} />,  fontClass: 'jb-nav-font-main' },
+  { label: 'Jobs',           active: true,  icon: <BriefcaseBusiness size={20} strokeWidth={1.9} />, fontClass: 'jb-nav-font-main' },
+  { label: 'Auto Apply',     active: false, icon: <Bot size={20} strokeWidth={1.9} />,               fontClass: 'jb-nav-font-main' },
+  { label: 'Profile',        active: false, icon: <CircleUserRound size={20} strokeWidth={1.9} />,   fontClass: 'jb-nav-font-main' },
+  { label: 'Resume',         active: false, icon: <FileUser size={20} strokeWidth={1.9} />,          fontClass: 'jb-nav-font-main' },
+  { label: 'Job Preference', active: false, icon: <SlidersHorizontal size={20} strokeWidth={1.9} />, fontClass: 'jb-nav-font-main' },
 ]
 const NAV_USER_MENU = [
-  { label: 'Refer & Affiliate', icon: <FigIcon src={FIG_REFER} /> },
-  { label: 'Usage',             icon: <FigIcon src={FIG_USAGE} /> },
-  { label: 'Setting',           icon: <FigIcon src={FIG_SET} />   },
+  { label: 'Refer & Affiliate', icon: <HandCoins size={18} strokeWidth={1.9} /> },
+  { label: 'Usage',             icon: <ChartNoAxesColumn size={18} strokeWidth={1.9} /> },
+  { label: 'Setting',           icon: <Settings size={18} strokeWidth={1.9} /> },
 ]
 
 // ── Helpers ────────────────────────────────────────────────────────
@@ -426,208 +317,64 @@ function CompanyAvatar({ name, color, size = 36 }: { name: string; color: string
   )
 }
 
-function MatchRing({ pct }: { pct: number }) {
-  const tier = pct >= 90 ? 'elite' : pct >= 80 ? 'high' : pct >= 65 ? 'mid' : 'low'
-  return (
-    <div className={`jb-ring jb-ring--${tier}`} style={{ '--p': `${pct}%` } as React.CSSProperties}>
-      <div className="jb-ring-inner">
-        <span className="jb-ring-pct">{pct}<span className="jb-ring-pc">%</span></span>
-        <span className="jb-ring-lbl">match</span>
-      </div>
-    </div>
-  )
-}
-
-function WorkModeBadge({ mode }: { mode: Job['workMode'] }) {
-  const cls = { Remote: 'jb-wm--remote', Hybrid: 'jb-wm--hybrid', 'On-site': 'jb-wm--onsite' }[mode]
-  return <span className={`jb-wm ${cls}`}>{mode}</span>
-}
-
 const STATUS_META: Record<AppStatus, { label: string; cls: string }> = {
   pending: { label: 'Pending', cls: 'aa-s--pending' },
   applied: { label: 'Applied', cls: 'aa-s--applied' },
 }
 
-// ── Job Card ───────────────────────────────────────────────────────
-function JobCard({ job, onSave }: { job: Job; onSave: (id: number) => void }) {
-  const isApplied = !!job.appliedDate
-
-  return (
-    <article className="jb-card">
-
-      {/* Top row: time · applicants + save / link icons */}
-      <div className="jb-card-top">
-        <div className="jb-card-top-meta">
-          <span className="jb-mt">{job.posted}</span>
-          <span className="jb-mtsep" />
-          <span className="jb-mt">{job.applicants} applicants</span>
-          {job.hot && <span className="jb-hot">🔥 Hot</span>}
-        </div>
-        <div className="jb-card-top-actions">
-          <button
-            className={`jb-ico${job.saved ? ' is-saved' : ''}`}
-            onClick={() => onSave(job.id)}
-            aria-label="Save job"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round"
-              fill={job.saved ? 'var(--color-main-default)' : 'none'}
-              stroke={job.saved ? 'var(--color-main-default)' : 'currentColor'}>
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          </button>
-          <a className="jb-ico" href="#" aria-label="Open original listing">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-
-      {/* Header: company avatar + name/title | match ring */}
-      <div className="jb-card-hd">
-        <div className="jb-card-hd-left">
-          <CompanyAvatar name={job.company} color={job.companyColor} size={40} />
-          <div className="jb-card-hd-info">
-            <p className="jb-co">{job.company}</p>
-            <h3 className="jb-title">{job.title}</h3>
-          </div>
-        </div>
-        <MatchRing pct={job.match} />
-      </div>
-
-      {/* Location */}
-      <div className="jb-loc-row">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-        </svg>
-        <span className="jb-loc">{job.location}</span>
-      </div>
-
-      {/* Tags: work mode · type · level · exp · salary */}
-      <div className="jb-card-tags">
-        <WorkModeBadge mode={job.workMode} />
-        <span className="jb-tag">{job.type}</span>
-        <span className="jb-tag">{job.level}</span>
-        <span className="jb-tag">{job.exp} exp</span>
-        <span className="jb-tag jb-tag--salary">{job.salary}</span>
-      </div>
-
-      {/* Footer: primary actions */}
-      <div className="jb-card-ft">
-        <div className="jb-ft-actions">
-          <button className="jb-ref-btn">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-            Referral
-          </button>
-          {isApplied ? (
-            <span className="jb-applied-btn">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              Applied {job.appliedDate}
-              {job.badges.includes('Auto Applied') && <span className="jb-applied-auto">· Auto</span>}
-            </span>
-          ) : (
-            <button className="jb-apply-btn">
-              Apply Now
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="5" y1="12" x2="19" y2="12"/>
-                <polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
-          )}
-        </div>
-      </div>
-    </article>
-  )
-}
-
 // ── Auto Apply Panel ───────────────────────────────────────────────
 function AutoApplyPanel() {
   const [enabled, setEnabled] = useState(true)
-  const creditsRemaining = 103, creditsTotal = 150
 
   return (
     <div className="aa-panel">
-      {/* Header */}
-      <div className="aa-hd">
-        <div className="aa-hd-left">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <span className="aa-hd-title">Auto Apply</span>
+      <div className="aa-top-card">
+        {/* Header */}
+        <div className="aa-hd">
+          <div className="aa-hd-left">
+            <Bot size={18} strokeWidth={2} />
+            <span className="aa-hd-title">Auto Apply</span>
+          </div>
+          <AutoApplyToggleButton enabled={enabled} onToggle={() => setEnabled(v => !v)} />
         </div>
-        <button className={`aa-toggle${enabled ? ' is-on' : ''}`} onClick={() => setEnabled(v => !v)} aria-label="Toggle Auto Apply">
-          <span className="aa-toggle-knob" />
-        </button>
-      </div>
 
-      {/* Live status */}
-      <div className={`aa-status${enabled ? ' aa-status--on' : ''}`}>
-        <div className="aa-status-row">
-          <span className={`aa-pulse${enabled ? ' is-live' : ''}`} />
-          <span className="aa-status-label">{enabled ? 'Running' : 'Paused'}</span>
-          <div className="aa-credit-pill" tabIndex={0}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="aa-credit-bolt">
-              <polygon points="13,2 4,14 11,14 11,22 20,10 13,10" fill="var(--color-text-default)"/>
-            </svg>
-            <span className="aa-credit-num">{creditsRemaining}</span>
-            {/* Hover popover */}
-            <div className="aa-credit-popover">
-              <div className="aa-cp-card">
-                <div className="aa-cp-row aa-cp-plan">
-                  <span className="aa-cp-plan-name">Free</span>
-                  <button className="aa-cp-upgrade">Upgrade</button>
+        {/* Live status */}
+        <div className={`aa-status${enabled ? ' aa-status--on' : ''}`}>
+          <div className="aa-status-row">
+            <span className={`aa-pulse${enabled ? ' is-live' : ''}`} />
+            <span className="aa-status-label">{enabled ? 'Running' : 'Paused'}</span>
+          </div>
+          <div className="aa-steps">
+            {['Scanning', 'Matching', 'Applying'].flatMap((s, i) => {
+              const delay = i * 0.9
+              const items = []
+              if (i > 0) items.push(
+                <span key={`arrow-${i}`} className={`aa-step-arrow${enabled ? ' is-active' : ''}`}
+                  style={enabled ? { animationDelay: `${delay - 0.45}s` } : undefined}>›</span>
+              )
+              items.push(
+                <div key={s} className={`aa-step${enabled ? ' is-active' : ''}`}
+                  style={enabled ? { animationDelay: `${delay}s` } : undefined}>
+                  <span className="aa-step-dot" />
+                  {s}
                 </div>
-                <div className="aa-cp-divider" />
-                <div className="aa-cp-row aa-cp-credits-row">
-                  <div className="aa-cp-credits-label">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <polygon points="13,2 4,14 11,14 11,22 20,10 13,10" fill="var(--color-text-default)"/>
-                    </svg>
-                    <span>Credits</span>
-                  </div>
-                  <span className="aa-cp-credits-val">{creditsRemaining}</span>
-                </div>
-                <button className="aa-cp-usage">Usage detail <span>→</span></button>
-              </div>
+              )
+              return items
+            })}
+          </div>
+          <div className="aa-today-stats">
+            <div className="aa-tstat">
+              <strong>12</strong>
+              <span>Today</span>
             </div>
-          </div>
-        </div>
-        <div className="aa-steps">
-          {['Scanning', 'Matching', 'Applying'].flatMap((s, i) => {
-            const delay = i * 0.9
-            const items = []
-            if (i > 0) items.push(
-              <span key={`arrow-${i}`} className={`aa-step-arrow${enabled ? ' is-active' : ''}`}
-                style={enabled ? { animationDelay: `${delay - 0.45}s` } : undefined}>›</span>
-            )
-            items.push(
-              <div key={s} className={`aa-step${enabled ? ' is-active' : ''}`}
-                style={enabled ? { animationDelay: `${delay}s` } : undefined}>
-                <span className="aa-step-dot" />
-                {s}
-              </div>
-            )
-            return items
-          })}
-        </div>
-        <div className="aa-today-stats">
-          <div className="aa-tstat">
-            <strong>12</strong>
-            <span>Today</span>
-          </div>
-          <div className="aa-tstat">
-            <strong>315</strong>
-            <span>Total</span>
-          </div>
-          <div className="aa-tstat">
-            <strong>3</strong>
-            <span>Pending</span>
+            <div className="aa-tstat">
+              <strong>315</strong>
+              <span>Total</span>
+            </div>
+            <div className="aa-tstat">
+              <strong>3</strong>
+              <span>Pending</span>
+            </div>
           </div>
         </div>
       </div>
@@ -635,104 +382,44 @@ function AutoApplyPanel() {
       {/* Credit alerts */}
       <div className="aa-alert aa-alert--error">
         <span className="aa-alert-msg">You are out of credit</span>
-        <button className="aa-alert-cta">Upgrade</button>
+        <AlertCtaButton>Upgrade</AlertCtaButton>
       </div>
       <div className="aa-alert aa-alert--warn">
         <span className="aa-alert-msg">You've used 90% of credit</span>
-        <button className="aa-alert-cta">Upgrade</button>
+        <AlertCtaButton>Upgrade</AlertCtaButton>
       </div>
 
-      {/* Live Workspace */}
-      <div className="aa-list-hd">
-        <div className="aa-list-hd-left">
-          <span className={`aa-pulse${enabled ? ' is-live' : ''}`} style={{ width: 7, height: 7 }} />
-          <span className="aa-list-title">Live Workspace</span>
+      <div className="aa-live-card">
+        {/* Live Workspace */}
+        <div className="aa-list-hd">
+          <div className="aa-list-hd-left">
+            <span className={`aa-pulse${enabled ? ' is-live' : ''}`} style={{ width: 7, height: 7 }} />
+            <span className="aa-list-title">Live Workspace</span>
+          </div>
+          <span className="aa-list-count">{AUTO_APPS.length}</span>
         </div>
-        <span className="aa-list-count">{AUTO_APPS.length}</span>
-      </div>
-      <div className="aa-list">
-        {AUTO_APPS.map((app, i) => {
-          const s = STATUS_META[app.status]
-          return (
-            <div
-              key={app.id}
-              className={`aa-item aa-item--${app.status}`}
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <div className={`aa-item-av-wrap${app.status === 'applied' ? ' aa-item--applied' : ''}`}>
-                <CompanyAvatar name={app.company} color={app.companyColor} size={32} />
+        <div className="aa-list">
+          {AUTO_APPS.map((app, i) => {
+            const s = STATUS_META[app.status]
+            return (
+              <div
+                key={app.id}
+                className={`aa-item aa-item--${app.status}`}
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className={`aa-item-av-wrap${app.status === 'applied' ? ' aa-item--applied' : ''}`}>
+                  <CompanyAvatar name={app.company} color={app.companyColor} size={32} />
+                </div>
+                <div className="aa-item-info">
+                  <p className="aa-item-title">{app.title}</p>
+                  <p className="aa-item-co">{app.company} · {app.date}</p>
+                </div>
+                <span className={`aa-status-badge ${s.cls}`}>{s.label}</span>
               </div>
-              <div className="aa-item-info">
-                <p className="aa-item-title">{app.title}</p>
-                <p className="aa-item-co">{app.company} · {app.date}</p>
-              </div>
-              <span className={`aa-status-badge ${s.cls}`}>{s.label}</span>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-// ── Floating Nova Chat ─────────────────────────────────────────────
-const NOVA_CHIPS = ['Explore Company Questions', 'Analyze My Resume', 'Connect with Employees']
-
-function FloatingChat() {
-  const [open, setOpen] = useState(false)
-  const [msg, setMsg] = useState('')
-
-  return (
-    <div className="nova-float">
-      {open && (
-        <div className="nova-float-panel">
-          <div className="nova-float-hd">
-            <div className="nova-float-av">
-              <img src="https://www.figma.com/api/mcp/asset/ba1b2d6c-a0cd-4a03-a34c-87e122c90c3b" alt="" width={20} height={20} />
-            </div>
-            <div>
-              <p className="nova-float-name">Nova</p>
-              <p className="nova-float-sub">AI Career Assistant</p>
-            </div>
-            <span className="nova-float-online" />
-            <button className="nova-float-close" onClick={() => setOpen(false)} aria-label="Close">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-          <div className="nova-float-body">
-            <div className="nova-float-bubble">
-              <p><strong>Hi! 👋 I&apos;m Nova.</strong></p>
-              <p>Your personal AI career assistant. Let&apos;s get started!</p>
-            </div>
-            <div className="nova-float-chips">
-              {NOVA_CHIPS.map(c => (
-                <button key={c} className="nova-float-chip">{c}</button>
-              ))}
-            </div>
-          </div>
-          <div className="nova-float-input-row">
-            <input
-              className="nova-float-input"
-              placeholder="Ask me anything…"
-              value={msg}
-              onChange={e => setMsg(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') setMsg('') }}
-            />
-            <button className={`nova-float-send${msg ? ' is-ready' : ''}`} aria-label="Send">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
-          </div>
+            )
+          })}
         </div>
-      )}
-
-      <button className={`nova-float-btn${open ? ' is-open' : ''}`} onClick={() => setOpen(v => !v)} aria-label="Open Nova AI chat">
-        {open ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        ) : (
-          <img src="https://www.figma.com/api/mcp/asset/ba1b2d6c-a0cd-4a03-a34c-87e122c90c3b" alt="Nova" width={24} height={24} />
-        )}
-        {!open && <span className="nova-float-pip" />}
-      </button>
+      </div>
     </div>
   )
 }
@@ -829,7 +516,7 @@ export default function JobsPage() {
       {/* Sidebar */}
       <aside className="jb-sidebar">
         <div className="jb-brand">
-          <img src={FIG_LOGO} alt="JobNova" width={126} height={36} style={{ objectFit: 'contain' }} />
+          <img src={FIG_LOGO} alt="JobNova" width={116} height={32} style={{ objectFit: 'contain' }} />
         </div>
         <nav className="jb-nav">
           {NAV_MAIN.map(item => (
@@ -869,31 +556,64 @@ export default function JobsPage() {
         </div>
       </aside>
 
-      {/* Main */}
-      <main className="jb-main">
-        {/* Tab bar — fixed header */}
+      {/* 内容区域：共享标题栏 + 下方双栏 */}
+      <section className="jb-content">
+        {/* 顶部标签栏：横跨列表和右侧栏 */}
         <div className="jb-main-hd">
-          <div className="jb-tab-bar">
-            <div className="jb-seg">
-              <button className={`jb-seg-item${activeTab === 'recommend' ? ' is-active' : ''}`} onClick={() => setActiveTab('recommend')}>
-                Recommend Jobs
-                <span className="jb-seg-n">{JOBS.length}</span>
-              </button>
-              <button className={`jb-seg-item${activeTab === 'square' ? ' is-active' : ''}`} onClick={() => setActiveTab('square')}>
-                Job Square
-              </button>
+          <div className="jb-main-hd-inner">
+            <div className="jb-main-hd-main">
+              <div className="jb-tab-bar">
+                <div className="jb-seg">
+                  <HeaderTabButton
+                    active={activeTab === 'recommend'}
+                    onClick={() => setActiveTab('recommend')}
+                    label="Recommend Jobs"
+                  />
+                  <HeaderTabButton
+                    active={activeTab === 'square'}
+                    onClick={() => setActiveTab('square')}
+                    label="Job Square"
+                  />
+                </div>
+                <SavedJobsButton />
+              </div>
             </div>
-            <button className="jb-fpill jb-fpill--saved">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-              Saved
-            </button>
+            <div className="jb-main-hd-side">
+              <div className="jb-credit-pill" tabIndex={0} aria-label="Credit balance">
+                <svg className="jb-credit-icon" width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M6.35343 15.677L11.881 7.19356C12.098 6.86024 12.01 6.40976 11.684 6.1877C11.5677 6.10833 11.431 6.066 11.2912 6.06606H6.94507V0.725344C6.94507 0.324837 6.62782 0 6.23639 0C5.99931 0 5.77814 0.121166 5.64659 0.322951L0.119031 8.80644C-0.0979978 9.13976 -0.00998805 9.59 0.315786 9.8123C0.432163 9.89175 0.568929 9.93416 0.708833 9.93417H5.05494V15.2747C5.05494 15.6752 5.37219 16 5.76362 16C6.0007 16 6.2221 15.8788 6.35343 15.677Z" fill="var(--color-text-default)" />
+                </svg>
+                <span className="jb-credit-value">230</span>
+                <div className="aa-credit-popover">
+                  <div className="aa-cp-card">
+                    <div className="aa-cp-row aa-cp-plan">
+                      <span className="aa-cp-plan-name">Free</span>
+                      <UpgradeButton />
+                    </div>
+                    <div className="aa-cp-divider" />
+                    <div className="aa-cp-row aa-cp-credits-row">
+                      <div className="aa-cp-credits-label">
+                        <svg className="aa-cp-credits-icon" width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M6.35343 15.677L11.881 7.19356C12.098 6.86024 12.01 6.40976 11.684 6.1877C11.5677 6.10833 11.431 6.066 11.2912 6.06606H6.94507V0.725344C6.94507 0.324837 6.62782 0 6.23639 0C5.99931 0 5.77814 0.121166 5.64659 0.322951L0.119031 8.80644C-0.0979978 9.13976 -0.00998805 9.59 0.315786 9.8123C0.432163 9.89175 0.568929 9.93416 0.708833 9.93417H5.05494V15.2747C5.05494 15.6752 5.37219 16 5.76362 16C6.0007 16 6.2221 15.8788 6.35343 15.677Z" fill="var(--color-text-default)" />
+                        </svg>
+                        <span>Credits</span>
+                      </div>
+                      <span className="aa-cp-credits-val">230</span>
+                    </div>
+                    <UsageDetailButton />
+                  </div>
+                </div>
+              </div>
+              <TopAvatarButton label="N" />
+            </div>
           </div>
         </div>
 
-        {/* Scrollable content: filters + results + cards */}
-        <div className="jb-list">
+        <div className="jb-content-body">
+          {/* 主列表区域 */}
+          <main className="jb-main">
+            {/* 固定筛选 + 仅列表滚动 */}
+            <div className="jb-list">
           <div className="jb-filters" ref={filterRef}>
             {/* Row 1: Search + Sort dropdown */}
             <div className="jb-filter-row1">
@@ -901,26 +621,25 @@ export default function JobsPage() {
                 <svg className="jb-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input className="jb-search-input" placeholder="Search roles, companies…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
                 {searchQuery && (
-                  <button className="jb-search-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                  </button>
+                  <SearchClearButton onClick={() => setSearchQuery('')} />
                 )}
               </div>
               <div className="jb-drop-wrap">
-                <button className={`jb-fdrop jb-fdrop--sort${openFilter === 'sort' ? ' is-open' : ''}`}
-                  onClick={() => setOpenFilter(f => f === 'sort' ? null : 'sort')}>
+                <FilterDropdownButton
+                  open={openFilter === 'sort'}
+                  onClick={() => setOpenFilter(f => f === 'sort' ? null : 'sort')}
+                  className="jb-fdrop--sort"
+                >
                   {SORT_LABELS[sortBy]}
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'sort' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
+                </FilterDropdownButton>
                 {openFilter === 'sort' && (
                   <div className="jb-filter-panel jb-filter-panel--right">
                     {(['recommended', 'match', 'recent'] as const)
                       .filter(v => activeTab === 'recommend' || v !== 'match')
                       .map(v => (
-                        <button key={v} className={`jb-panel-item${sortBy === v ? ' is-selected' : ''}`}
-                          onClick={() => { setSortBy(v); setOpenFilter(null) }}>
+                        <SortPanelItemButton key={v} selected={sortBy === v} onClick={() => { setSortBy(v); setOpenFilter(null) }}>
                           {SORT_LABELS[v]}
-                        </button>
+                        </SortPanelItemButton>
                       ))}
                   </div>
                 )}
@@ -932,24 +651,23 @@ export default function JobsPage() {
               <div className="jb-filter-row2">
                 {/* Work Mode dropdown */}
                 <div className="jb-drop-wrap">
-                  <button className={`jb-fdrop${openFilter === 'workmode' ? ' is-open' : ''}${workModes.size > 0 ? ' is-active' : ''}`}
-                    onClick={() => setOpenFilter(f => f === 'workmode' ? null : 'workmode')}>
+                  <FilterDropdownButton
+                    open={openFilter === 'workmode'}
+                    active={workModes.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'workmode' ? null : 'workmode')}
+                  >
                     {fdropLabel(workModes, 'Work Mode', WORK_MODE_DISPLAY)}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'workmode' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
+                  </FilterDropdownButton>
                   {openFilter === 'workmode' && (
                     <div className="jb-filter-panel">
                       <p className="jb-panel-label">Work Mode</p>
                       {([['Remote', 'remote'], ['Hybrid', 'hybrid'], ['On-site', 'onsite']] as const).map(([label, key]) => (
-                        <button key={key} className="jb-panel-check-row" onClick={() => toggleMode(key)}>
-                          <span className={`jb-panel-checkbox${workModes.has(key) ? ' is-checked' : ''}`}>
-                            {workModes.has(key) && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                          </span>
+                        <FilterPanelOptionButton key={key} selected={workModes.has(key)} onClick={() => toggleMode(key)}>
                           {label}
-                        </button>
+                        </FilterPanelOptionButton>
                       ))}
                       <div className="jb-panel-footer jb-panel-footer--single">
-                        <button className="jb-panel-confirm" onClick={() => setOpenFilter(null)}>Confirm</button>
+                        <PanelConfirmButton onClick={() => setOpenFilter(null)} />
                       </div>
                     </div>
                   )}
@@ -958,24 +676,23 @@ export default function JobsPage() {
 
                 {/* Job Type dropdown */}
                 <div className="jb-drop-wrap">
-                  <button className={`jb-fdrop${openFilter === 'jobtype' ? ' is-open' : ''}${jobTypes.size > 0 ? ' is-active' : ''}`}
-                    onClick={() => setOpenFilter(f => f === 'jobtype' ? null : 'jobtype')}>
+                  <FilterDropdownButton
+                    open={openFilter === 'jobtype'}
+                    active={jobTypes.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'jobtype' ? null : 'jobtype')}
+                  >
                     {fdropLabel(jobTypes, 'Job Type')}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'jobtype' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
+                  </FilterDropdownButton>
                   {openFilter === 'jobtype' && (
                     <div className="jb-filter-panel">
                       <p className="jb-panel-label">Job Type</p>
                       {['Full-time', 'Contract', 'Part-time', 'Internship'].map(t => (
-                        <button key={t} className="jb-panel-check-row" onClick={() => toggleJobType(t)}>
-                          <span className={`jb-panel-checkbox${jobTypes.has(t) ? ' is-checked' : ''}`}>
-                            {jobTypes.has(t) && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                          </span>
+                        <FilterPanelOptionButton key={t} selected={jobTypes.has(t)} onClick={() => toggleJobType(t)}>
                           {t}
-                        </button>
+                        </FilterPanelOptionButton>
                       ))}
                       <div className="jb-panel-footer jb-panel-footer--single">
-                        <button className="jb-panel-confirm" onClick={() => setOpenFilter(null)}>Confirm</button>
+                        <PanelConfirmButton onClick={() => setOpenFilter(null)} />
                       </div>
                     </div>
                   )}
@@ -983,24 +700,23 @@ export default function JobsPage() {
 
                 {/* Level dropdown */}
                 <div className="jb-drop-wrap">
-                  <button className={`jb-fdrop${openFilter === 'level' ? ' is-open' : ''}${levels.size > 0 ? ' is-active' : ''}`}
-                    onClick={() => setOpenFilter(f => f === 'level' ? null : 'level')}>
+                  <FilterDropdownButton
+                    open={openFilter === 'level'}
+                    active={levels.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'level' ? null : 'level')}
+                  >
                     {fdropLabel(levels, 'Level')}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'level' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
+                  </FilterDropdownButton>
                   {openFilter === 'level' && (
                     <div className="jb-filter-panel">
                       <p className="jb-panel-label">Level</p>
                       {['Intern / New Grad', 'Entry-Mid', 'Mid', 'Senior', 'Lead', 'Director+'].map(l => (
-                        <button key={l} className="jb-panel-check-row" onClick={() => toggleLevel(l)}>
-                          <span className={`jb-panel-checkbox${levels.has(l) ? ' is-checked' : ''}`}>
-                            {levels.has(l) && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                          </span>
+                        <FilterPanelOptionButton key={l} selected={levels.has(l)} onClick={() => toggleLevel(l)}>
                           {l}
-                        </button>
+                        </FilterPanelOptionButton>
                       ))}
                       <div className="jb-panel-footer jb-panel-footer--single">
-                        <button className="jb-panel-confirm" onClick={() => setOpenFilter(null)}>Confirm</button>
+                        <PanelConfirmButton onClick={() => setOpenFilter(null)} />
                       </div>
                     </div>
                   )}
@@ -1008,20 +724,22 @@ export default function JobsPage() {
 
                 {/* Location dropdown */}
                 <div className="jb-drop-wrap">
-                  <button className={`jb-fdrop${openFilter === 'location' ? ' is-open' : ''}${selectedLocations.size > 0 ? ' is-active' : ''}`}
-                    onClick={() => setOpenFilter(f => f === 'location' ? null : 'location')}>
+                  <FilterDropdownButton
+                    open={openFilter === 'location'}
+                    active={selectedLocations.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'location' ? null : 'location')}
+                  >
                     {fdropLabel(selectedLocations, 'Location')}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'location' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
+                  </FilterDropdownButton>
                   {openFilter === 'location' && (
                     <div className="jb-filter-panel jb-filter-panel--loc jb-filter-panel--right">
                       {/* Quick pick */}
                       <p className="jb-panel-label">Quick pick</p>
                       <div className="jb-loc-quick">
                         {LOC_QUICK.map(r => (
-                          <button key={r} className={`jb-loc-qpill${selectedLocations.has(r) ? ' is-on' : ''}`} onClick={() => toggleLocation(r)}>
+                          <LocationQuickPickButton key={r} active={selectedLocations.has(r)} onClick={() => toggleLocation(r)}>
                             {r}
-                          </button>
+                          </LocationQuickPickButton>
                         ))}
                       </div>
 
@@ -1031,9 +749,7 @@ export default function JobsPage() {
                           {Array.from(selectedLocations).map(loc => (
                             <span key={loc} className="jb-loc-inline-chip">
                               {loc}
-                              <button className="jb-loc-inline-chip-x" onClick={e => { e.stopPropagation(); toggleLocation(loc) }}>
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                              </button>
+                              <LocationChipRemoveButton onClick={e => { e.stopPropagation(); toggleLocation(loc) }} />
                             </span>
                           ))}
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--color-text-second-2)', flexShrink: 0 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1044,19 +760,17 @@ export default function JobsPage() {
                             onChange={e => setLocSearch(e.target.value)}
                           />
                           {locSearch && (
-                            <button className="jb-loc-searchbox-clear" onClick={() => setLocSearch('')}>
-                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            </button>
+                            <SearchClearButton onClick={() => setLocSearch('')} className="jb-loc-searchbox-clear" />
                           )}
                         </div>
                         {locSearch && (
                           <div className="jb-loc-dropdown">
                             {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).map(city => (
-                              <button key={city} className={`jb-loc-result-row${selectedLocations.has(city) ? ' is-selected' : ''}`} onClick={() => { toggleLocation(city); setLocSearch('') }}>
+                              <LocationResultRowButton key={city} selected={selectedLocations.has(city)} onClick={() => { toggleLocation(city); setLocSearch('') }}>
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                                 {city}
                                 {selectedLocations.has(city) && <svg className="jb-loc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                              </button>
+                              </LocationResultRowButton>
                             ))}
                             {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).length === 0 && (
                               <p className="jb-loc-no-results">No cities found</p>
@@ -1067,45 +781,48 @@ export default function JobsPage() {
 
                       {/* Footer */}
                       <div className="jb-panel-footer">
-                        <button className="jb-panel-reset" onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }}>Reset</button>
-                        <button className="jb-panel-confirm" onClick={() => setOpenFilter(null)}>Confirm</button>
+                        <PanelResetButton onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }} />
+                        <PanelConfirmButton onClick={() => setOpenFilter(null)} />
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="jb-filter-sep" />
-                <button className={`jb-fpill jb-fpill--manual${manualOnly ? ' is-on' : ''}`} onClick={() => setManualOnly(v => !v)} style={{ marginLeft: 'auto', flexShrink: 0 }}>
+                <TogglePillButton
+                  active={manualOnly}
+                  onClick={() => setManualOnly(v => !v)}
+                  className="jb-fpill jb-fpill--manual"
+                  style={{ marginLeft: 'auto', flexShrink: 0 }}
+                >
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                   Manual apply
-                </button>
-                <button className={`jb-fpill jb-fpill--referral${referralOnly ? ' is-on' : ''}`} onClick={() => setReferralOnly(v => !v)} style={{ flexShrink: 0 }}>
+                </TogglePillButton>
+                <TogglePillButton active={referralOnly} onClick={() => setReferralOnly(v => !v)} className="jb-fpill jb-fpill--referral" style={{ flexShrink: 0 }}>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                   Referral only
-                </button>
+                </TogglePillButton>
               </div>
             ) : (
               <div className="jb-filter-row2">
                 {/* Signal dropdown */}
                 <div className="jb-drop-wrap">
-                  <button className={`jb-fdrop${openFilter === 'signal' ? ' is-open' : ''}${jsSignals.size > 0 ? ' is-active' : ''}`}
-                    onClick={() => setOpenFilter(f => f === 'signal' ? null : 'signal')}>
+                  <FilterDropdownButton
+                    open={openFilter === 'signal'}
+                    active={jsSignals.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'signal' ? null : 'signal')}
+                  >
                     {fdropLabel(jsSignals, 'Signal')}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'signal' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
+                  </FilterDropdownButton>
                   {openFilter === 'signal' && (
                     <div className="jb-filter-panel">
                       <p className="jb-panel-label">Signal</p>
                       {['Founding', 'Hiring Fast', 'New Team', 'Expansion'].map(s => (
-                        <button key={s} className="jb-panel-check-row" onClick={() => toggleJsSignal(s)}>
-                          <span className={`jb-panel-checkbox${jsSignals.has(s) ? ' is-checked' : ''}`}>
-                            {jsSignals.has(s) && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                          </span>
+                        <FilterPanelOptionButton key={s} selected={jsSignals.has(s)} onClick={() => toggleJsSignal(s)}>
                           {s}
-                        </button>
+                        </FilterPanelOptionButton>
                       ))}
                       <div className="jb-panel-footer jb-panel-footer--single">
-                        <button className="jb-panel-confirm" onClick={() => setOpenFilter(null)}>Confirm</button>
+                        <PanelConfirmButton onClick={() => setOpenFilter(null)} />
                       </div>
                     </div>
                   )}
@@ -1113,17 +830,21 @@ export default function JobsPage() {
 
                 {/* Location dropdown — same panel as Recommend Jobs */}
                 <div className="jb-drop-wrap">
-                  <button className={`jb-fdrop${openFilter === 'js-location' ? ' is-open' : ''}${selectedLocations.size > 0 ? ' is-active' : ''}`}
-                    onClick={() => setOpenFilter(f => f === 'js-location' ? null : 'js-location')}>
+                  <FilterDropdownButton
+                    open={openFilter === 'js-location'}
+                    active={selectedLocations.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'js-location' ? null : 'js-location')}
+                  >
                     {fdropLabel(selectedLocations, 'Location')}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ transition: 'transform 0.2s', transform: openFilter === 'js-location' ? 'rotate(180deg)' : 'none' }}><polyline points="6 9 12 15 18 9"/></svg>
-                  </button>
+                  </FilterDropdownButton>
                   {openFilter === 'js-location' && (
                     <div className="jb-filter-panel jb-filter-panel--loc">
                       <p className="jb-panel-label">Quick pick</p>
                       <div className="jb-loc-quick">
                         {LOC_QUICK.map(r => (
-                          <button key={r} className={`jb-loc-qpill${selectedLocations.has(r) ? ' is-on' : ''}`} onClick={() => toggleLocation(r)}>{r}</button>
+                          <LocationQuickPickButton key={r} active={selectedLocations.has(r)} onClick={() => toggleLocation(r)}>
+                            {r}
+                          </LocationQuickPickButton>
                         ))}
                       </div>
                       <div className="jb-loc-combobox">
@@ -1131,30 +852,28 @@ export default function JobsPage() {
                           {Array.from(selectedLocations).map(loc => (
                             <span key={loc} className="jb-loc-inline-chip">
                               {loc}
-                              <button className="jb-loc-inline-chip-x" onClick={e => { e.stopPropagation(); toggleLocation(loc) }}>
-                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                              </button>
+                              <LocationChipRemoveButton onClick={e => { e.stopPropagation(); toggleLocation(loc) }} />
                             </span>
                           ))}
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--color-text-second-2)', flexShrink: 0 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                           <input className="jb-loc-text-input" placeholder={selectedLocations.size === 0 ? 'Search city or country…' : ''} value={locSearch} onChange={e => setLocSearch(e.target.value)} />
-                          {locSearch && <button className="jb-loc-searchbox-clear" onClick={() => setLocSearch('')}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>}
+                          {locSearch && <SearchClearButton onClick={() => setLocSearch('')} className="jb-loc-searchbox-clear" />}
                         </div>
                         {locSearch && (
                           <div className="jb-loc-dropdown">
                             {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).map(city => (
-                              <button key={city} className={`jb-loc-result-row${selectedLocations.has(city) ? ' is-selected' : ''}`} onClick={() => { toggleLocation(city); setLocSearch('') }}>
+                              <LocationResultRowButton key={city} selected={selectedLocations.has(city)} onClick={() => { toggleLocation(city); setLocSearch('') }}>
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                                 {city}
                                 {selectedLocations.has(city) && <svg className="jb-loc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                              </button>
+                              </LocationResultRowButton>
                             ))}
                           </div>
                         )}
                       </div>
                       <div className="jb-panel-footer">
-                        <button className="jb-panel-reset" onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }}>Reset</button>
-                        <button className="jb-panel-confirm" onClick={() => setOpenFilter(null)}>Confirm</button>
+                        <PanelResetButton onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }} />
+                        <PanelConfirmButton onClick={() => setOpenFilter(null)} />
                       </div>
                     </div>
                   )}
@@ -1162,30 +881,31 @@ export default function JobsPage() {
 
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, flexShrink: 0 }}>
                   {([['LinkedIn', 'linkedin'], ['Platform', 'platform']] as const).map(([label, key]) => (
-                    <button key={key} className={`jb-fpill jb-fpill--remote${sources.has(key) ? ' is-on' : ''}`} onClick={() => toggleSource(key)}>
-                      {sources.has(key) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                      {label}
-                    </button>
+                    <SourcePillButton key={key} active={sources.has(key)} onClick={() => toggleSource(key)} label={label} />
                   ))}
                 </div>
               </div>
             )}
           </div>
 
-          {activeTab === 'recommend'
-            ? jobs.map(job => <JobCard key={job.id} job={job} onSave={toggleSave} />)
-            : <div className="js-grid">{JOB_SQUARE.map(item => <JobSquareCard key={item.id} item={item} onContact={setContactItem} />)}</div>
-          }
-        </div>
-      </main>
+              <div className="jb-list-scroll">
+                {activeTab === 'recommend'
+                  ? jobs.map(job => <JobCard key={job.id} job={job} onSave={toggleSave} />)
+                  : <div className="js-grid">{JOB_SQUARE.map(item => <JobSquareCard key={item.id} item={item} onContact={setContactItem} />)}</div>
+                }
+              </div>
+            </div>
+          </main>
 
-      {/* Right panel — toggles based on active tab */}
-      <aside className="jb-panel">
-        {activeTab === 'recommend' ? <AutoApplyPanel /> : <JobSquarePanel />}
-      </aside>
+          {/* 右侧栏：固定宽度，位于共享标题栏下方 */}
+          <aside className="jb-panel">
+            {activeTab === 'recommend' ? <AutoApplyPanel /> : <JobSquarePanel />}
+          </aside>
+        </div>
+      </section>
 
       {/* Floating Nova Chat */}
-      <FloatingChat />
+      <FloatingNovaChat />
 
       {/* Contact modal */}
       {contactItem && <ContactModal key={contactItem.id} item={contactItem} onClose={() => setContactItem(null)} />}

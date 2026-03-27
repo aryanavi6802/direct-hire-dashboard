@@ -325,20 +325,29 @@
   --btn-easing:          cubic-bezier(0.4, 0, 0.2, 1);
   --btn-hover-lift:      translateY(-2px);
   --btn-active-scale:    scale(0.96);
-  --btn-focus-ring:      0 0 0 3px rgba(176, 248, 9, 0.55);
+  --btn-focus-ring:      0 0 0 3px var(--color-main-tint-md);
+  --btn-height-s:        18px;
+  --btn-height-m:        30px;
+  --btn-height-l:        36px;
+  --btn-px-s:            var(--space-2);
+  --btn-px-m:            14px;
+  --btn-px-l:            16px;
+  --btn-font-size-s:     12px;
+  --btn-font-size-m:     13px;
+  --btn-font-size-l:     14px;
 
   /* Variant — Primary (Acid Green) */
   --btn-primary-bg:             var(--color-main-default);
   --btn-primary-color:          var(--color-text-default);
   --btn-primary-hover-opacity:  0.9;
-  --btn-primary-hover-shadow:   0 12px 36px rgba(176, 248, 9, 0.38);
+  --btn-primary-hover-shadow:   0 12px 36px var(--color-main-tint-md);
 
   /* Variant — Dark (Black) */
   --btn-dark-bg:                var(--color-text-default);
   --btn-dark-color:             var(--color-text-white);
-  --btn-dark-hover-shadow:      0 8px 24px rgba(9, 9, 11, 0.22);
+  --btn-dark-hover-shadow:      var(--shadow-sm);
 
   /* Variant — Ghost (Transparent) */
   --btn-ghost-color:            var(--color-text-default);
-  --btn-ghost-hover-bg:         rgba(0, 0, 0, 0.05);
+  --btn-ghost-hover-bg:         var(--color-surface-muted);
 }
