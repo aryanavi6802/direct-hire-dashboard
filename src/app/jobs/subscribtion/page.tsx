@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import {
   BriefcaseBusiness,
   Bot,
@@ -69,6 +69,14 @@ const CURRENT_MEMBER = {
   serviceEnd: '2026-12-31',
 }
 
+const AVATAR_TONES = [
+  { bg: 'var(--color-main-tint-sm)', fg: 'var(--color-text-green-dark)', ring: 'var(--color-main-tint-md)' },
+  { bg: 'var(--color-secondary-icon-bg)', fg: 'var(--color-secondary-text)', ring: 'rgba(99, 102, 241, 0.18)' },
+  { bg: 'var(--color-amber-100)', fg: 'var(--color-warning-text)', ring: 'rgba(217, 119, 6, 0.18)' },
+  { bg: 'var(--color-saved-pill-bg)', fg: 'var(--color-saved-pill)', ring: 'rgba(225, 29, 72, 0.16)' },
+  { bg: 'var(--color-linkedin-bg)', fg: 'var(--color-linkedin)', ring: 'rgba(10, 102, 194, 0.16)' },
+]
+
 export default function SubscribtionPage() {
   const [billing, setBilling] = useState<Billing>('monthly')
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(true)
@@ -78,6 +86,19 @@ export default function SubscribtionPage() {
   const serviceRange = `${CURRENT_MEMBER.serviceStart} - ${CURRENT_MEMBER.serviceEnd}`
   const subTitleText = `Hi ${CURRENT_MEMBER.name}, you are currently using the ${activePlanName}${activeTierLabel} plan. Service time: ${serviceRange}.`
   const memberInitial = CURRENT_MEMBER.name.trim().charAt(0).toUpperCase() || 'U'
+  const memberAvatarTone = useMemo(() => {
+    const idx = memberInitial.charCodeAt(0) % AVATAR_TONES.length
+    return AVATAR_TONES[idx]
+  }, [memberInitial])
+  const memberAvatarStyle = useMemo(
+    () =>
+      ({
+        background: memberAvatarTone.bg,
+        color: memberAvatarTone.fg,
+        border: `1px solid ${memberAvatarTone.ring}`,
+      }) as CSSProperties,
+    [memberAvatarTone],
+  )
 
   return (
     <div className="jb-layout">
@@ -126,7 +147,7 @@ export default function SubscribtionPage() {
             aria-controls="sub-profile-menu"
             onClick={() => setIsProfileMenuOpen(open => !open)}
           >
-              <div className="jb-user-av">{memberInitial}</div>
+              <div className="jb-user-av" style={memberAvatarStyle}>{memberInitial}</div>
             <div className="sub-profile-meta">
                 <p className="jb-user-name">{CURRENT_MEMBER.name}</p>
                 <p className="jb-user-plan">{activePlanName} Plan</p>
