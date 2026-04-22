@@ -12,7 +12,7 @@ export default function Features() {
         <div className="features-row features-row--2col">
 
           {/* Feature 1: Instant Job Notification */}
-          <div className="feature-card feature-card--large scroll-fade">
+          <div className="feature-card feature-card--large feature-card--notification scroll-fade">
             <div className="feature-icon">
               <svg width="24" height="24" fill="none" stroke="var(--color-text-default)" viewBox="0 0 24 24">
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -22,8 +22,8 @@ export default function Features() {
             <p className="feature-body">
               Our neural network scans 50,000+ sources per second. Be the first to apply with precision-matched alerts that arrive before the job hits public boards.
             </p>
-            <div className="feature-preview">
-              <img src="/Instant_Job_Notification.png" alt="Instant Job Notification preview" loading="lazy" />
+            <div className="feature-preview feature-preview--notification">
+              <img src="/img/features/Instant%20Job%20Notification.avif" alt="Instant Job Notification preview" loading="lazy" />
             </div>
           </div>
 
@@ -71,33 +71,12 @@ export default function Features() {
                   Scale your search effortlessly. Our agent automatically applies to over 3,000 curated positions that fit your criteria perfectly.
                 </p>
               </div>
-              <div className="auto-apply-gradient">
-                <div className="auto-apply-ui">
-                  <div className="aau-header">
-                    <span className="aau-title">Auto Applying</span>
-                    <span className="aau-live"><span className="aau-dot" />LIVE</span>
-                  </div>
-                  <div className="aau-list">
-                    {[
-                      { role: 'Product Manager', co: 'Stripe',    status: 'Sent' },
-                      { role: 'UX Designer',     co: 'Figma',     status: 'Sent' },
-                      { role: 'Data Analyst',    co: 'Airwallex', status: 'Queued' },
-                    ].map((item) => (
-                      <div key={item.role} className="aau-item">
-                        <div className="aau-item-info">
-                          <span className="aau-role">{item.role}</span>
-                          <span className="aau-co">{item.co}</span>
-                        </div>
-                        <span className={`aau-status aau-status--${item.status.toLowerCase()}`}>{item.status}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="aau-footer">
-                    <span>315 Applied this week</span>
-                    <span className="aau-rate">94% match rate</span>
-                  </div>
-                </div>
-              </div>
+              <img
+                className="auto-apply-preview-image"
+                src="/img/features/Auto%20Apply.avif"
+                alt="AI Auto Apply preview"
+                loading="lazy"
+              />
             </div>
           </div>
 

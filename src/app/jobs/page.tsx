@@ -21,6 +21,7 @@ import {
   LocationResultRowButton,
   SavedJobsButton,
   SearchClearButton,
+  SortPanelItemButton,
   TopAvatarButton,
   TogglePillButton,
   UpgradeButton,
@@ -30,6 +31,7 @@ import {
   BriefcaseBusiness,
   Bot,
   CircleUserRound,
+  CreditCard,
   FileUser,
   SlidersHorizontal,
   HandCoins,
@@ -300,6 +302,7 @@ const NAV_USER_MENU = [
   { label: 'Refer & Affiliate', icon: <HandCoins size={18} strokeWidth={1.9} /> },
   { label: 'Usage',             icon: <ChartNoAxesColumn size={18} strokeWidth={1.9} /> },
   { label: 'Setting',           icon: <Settings size={18} strokeWidth={1.9} /> },
+  { label: 'subscribtion',      icon: <CreditCard size={18} strokeWidth={1.9} /> },
   { label: 'Log out',           icon: <LogOut size={18} strokeWidth={1.9} /> },
 ]
 
@@ -621,6 +624,9 @@ export default function JobsPage() {
     const n = new Set(prev); n.has(loc) ? n.delete(loc) : n.add(loc); return n
   })
 
+  const [sortBy, setSortBy] = useState<'recommended' | 'match' | 'recent'>('recommended')
+  const SORT_LABELS: Record<string, string> = { recommended: 'Recommended', match: 'Top matched', recent: 'Most recent' }
+
   return (
     <div className="jb-layout">
 
@@ -670,7 +676,11 @@ export default function JobsPage() {
                   <span>{item.label}</span>
                 </button>
               ) : (
-                <a key={item.label} href="#" className="jb-user-menu-item">
+                <a
+                  key={item.label}
+                  href={item.label === 'subscribtion' ? '/jobs/subscribtion' : '#'}
+                  className="jb-user-menu-item"
+                >
                   {item.icon}
                   <span>{item.label}</span>
                 </a>
@@ -739,7 +749,7 @@ export default function JobsPage() {
             {/* 固定筛选 + 仅列表滚动 */}
             <div className="jb-list">
           <div className="jb-filters">
-            {/* Row 1: 搜索 + Location（原排序按钮位置） */}
+            {/* Row 1: Recommend = 搜索+排序；Direct hire = 搜索+Location（原排序位） */}
             <div className="jb-filter-row1">
               <div className={`jb-search${searchQuery ? ' is-filled' : ''}`}>
                 <svg className="jb-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -748,68 +758,89 @@ export default function JobsPage() {
                   <SearchClearButton onClick={() => setSearchQuery('')} />
                 )}
               </div>
-              <div className="jb-drop-wrap" data-jb-filter-drop="location">
-                <FilterDropdownButton
-                  open={openFilter === 'location'}
-                  active={selectedLocations.size > 0}
-                  onClick={() => setOpenFilter(f => f === 'location' ? null : 'location')}
-                  className="jb-fdrop--sort"
-                >
-                  {fdropLabel(selectedLocations, 'Location')}
-                </FilterDropdownButton>
-                {openFilter === 'location' && (
-                  <div className="jb-filter-panel jb-filter-panel--loc jb-filter-panel--right">
-                    <div className="jb-panel-label-row">
-                      <p className="jb-panel-label">Quick pick</p>
-                      <LocationResetIconButton onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }} />
-                    </div>
-                    <div className="jb-loc-quick">
-                      {LOC_QUICK.map(r => (
-                        <LocationQuickPickButton key={r} active={selectedLocations.has(r)} onClick={() => toggleLocation(r)}>
-                          {r}
-                        </LocationQuickPickButton>
+              {activeTab === 'recommend' ? (
+                <div className="jb-drop-wrap" data-jb-filter-drop="sort">
+                  <FilterDropdownButton
+                    open={openFilter === 'sort'}
+                    onClick={() => setOpenFilter(f => f === 'sort' ? null : 'sort')}
+                    className="jb-fdrop--sort"
+                  >
+                    {SORT_LABELS[sortBy]}
+                  </FilterDropdownButton>
+                  {openFilter === 'sort' && (
+                    <div className="jb-filter-panel jb-filter-panel--right">
+                      {(['recommended', 'match', 'recent'] as const).map(v => (
+                        <SortPanelItemButton key={v} selected={sortBy === v} onClick={() => { setSortBy(v); setOpenFilter(null) }}>
+                          {SORT_LABELS[v]}
+                        </SortPanelItemButton>
                       ))}
                     </div>
-                    <div className="jb-loc-combobox">
-                      <div className="jb-loc-input-area">
-                        {Array.from(selectedLocations).map(loc => (
-                          <span key={loc} className="jb-loc-inline-chip">
-                            {loc}
-                            <LocationChipRemoveButton onClick={e => { e.stopPropagation(); toggleLocation(loc) }} />
-                          </span>
-                        ))}
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--color-text-second-2)', flexShrink: 0 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        <input
-                          className="jb-loc-text-input"
-                          placeholder={selectedLocations.size === 0 ? 'Search city or country…' : ''}
-                          value={locSearch}
-                          onChange={e => setLocSearch(e.target.value)}
-                        />
-                        {locSearch && (
-                          <SearchClearButton onClick={() => setLocSearch('')} className="jb-loc-searchbox-clear" />
-                        )}
+                  )}
+                </div>
+              ) : (
+                <div className="jb-drop-wrap" data-jb-filter-drop="location">
+                  <FilterDropdownButton
+                    open={openFilter === 'location'}
+                    active={selectedLocations.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'location' ? null : 'location')}
+                    className="jb-fdrop--sort"
+                  >
+                    {fdropLabel(selectedLocations, 'Location')}
+                  </FilterDropdownButton>
+                  {openFilter === 'location' && (
+                    <div className="jb-filter-panel jb-filter-panel--loc jb-filter-panel--right">
+                      <div className="jb-panel-label-row">
+                        <p className="jb-panel-label">Quick pick</p>
+                        <LocationResetIconButton onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }} />
                       </div>
-                      {locSearch && (
-                        <div className="jb-loc-dropdown">
-                          {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).map(city => (
-                            <LocationResultRowButton key={city} selected={selectedLocations.has(city)} onClick={() => { toggleLocation(city); setLocSearch('') }}>
-                              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                              {city}
-                              {selectedLocations.has(city) && <svg className="jb-loc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                            </LocationResultRowButton>
+                      <div className="jb-loc-quick">
+                        {LOC_QUICK.map(r => (
+                          <LocationQuickPickButton key={r} active={selectedLocations.has(r)} onClick={() => toggleLocation(r)}>
+                            {r}
+                          </LocationQuickPickButton>
+                        ))}
+                      </div>
+                      <div className="jb-loc-combobox">
+                        <div className="jb-loc-input-area">
+                          {Array.from(selectedLocations).map(loc => (
+                            <span key={loc} className="jb-loc-inline-chip">
+                              {loc}
+                              <LocationChipRemoveButton onClick={e => { e.stopPropagation(); toggleLocation(loc) }} />
+                            </span>
                           ))}
-                          {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).length === 0 && (
-                            <p className="jb-loc-no-results">No cities found</p>
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--color-text-second-2)', flexShrink: 0 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                          <input
+                            className="jb-loc-text-input"
+                            placeholder={selectedLocations.size === 0 ? 'Search city or country…' : ''}
+                            value={locSearch}
+                            onChange={e => setLocSearch(e.target.value)}
+                          />
+                          {locSearch && (
+                            <SearchClearButton onClick={() => setLocSearch('')} className="jb-loc-searchbox-clear" />
                           )}
                         </div>
-                      )}
+                        {locSearch && (
+                          <div className="jb-loc-dropdown">
+                            {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).map(city => (
+                              <LocationResultRowButton key={city} selected={selectedLocations.has(city)} onClick={() => { toggleLocation(city); setLocSearch('') }}>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                {city}
+                                {selectedLocations.has(city) && <svg className="jb-loc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                              </LocationResultRowButton>
+                            ))}
+                            {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).length === 0 && (
+                              <p className="jb-loc-no-results">No cities found</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Row 2: Recommend Jobs 专属筛选（Location 已移至首行右侧） */}
+            {/* Row 2: Recommend Jobs — Work Mode / Job Type / Level / Location + pills */}
             {activeTab === 'recommend' && (
               <div className="jb-filter-row2">
                 {/* Work Mode dropdown */}
@@ -872,6 +903,66 @@ export default function JobsPage() {
                           {l}
                         </FilterPanelOptionButton>
                       ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Location（Recommend 原位：第二行） */}
+                <div className="jb-drop-wrap" data-jb-filter-drop="location">
+                  <FilterDropdownButton
+                    open={openFilter === 'location'}
+                    active={selectedLocations.size > 0}
+                    onClick={() => setOpenFilter(f => f === 'location' ? null : 'location')}
+                  >
+                    {fdropLabel(selectedLocations, 'Location')}
+                  </FilterDropdownButton>
+                  {openFilter === 'location' && (
+                    <div className="jb-filter-panel jb-filter-panel--loc jb-filter-panel--right">
+                      <div className="jb-panel-label-row">
+                        <p className="jb-panel-label">Quick pick</p>
+                        <LocationResetIconButton onClick={() => { setSelectedLocations(new Set()); setLocSearch('') }} />
+                      </div>
+                      <div className="jb-loc-quick">
+                        {LOC_QUICK.map(r => (
+                          <LocationQuickPickButton key={r} active={selectedLocations.has(r)} onClick={() => toggleLocation(r)}>
+                            {r}
+                          </LocationQuickPickButton>
+                        ))}
+                      </div>
+                      <div className="jb-loc-combobox">
+                        <div className="jb-loc-input-area">
+                          {Array.from(selectedLocations).map(loc => (
+                            <span key={loc} className="jb-loc-inline-chip">
+                              {loc}
+                              <LocationChipRemoveButton onClick={e => { e.stopPropagation(); toggleLocation(loc) }} />
+                            </span>
+                          ))}
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--color-text-second-2)', flexShrink: 0 }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                          <input
+                            className="jb-loc-text-input"
+                            placeholder={selectedLocations.size === 0 ? 'Search city or country…' : ''}
+                            value={locSearch}
+                            onChange={e => setLocSearch(e.target.value)}
+                          />
+                          {locSearch && (
+                            <SearchClearButton onClick={() => setLocSearch('')} className="jb-loc-searchbox-clear" />
+                          )}
+                        </div>
+                        {locSearch && (
+                          <div className="jb-loc-dropdown">
+                            {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).map(city => (
+                              <LocationResultRowButton key={city} selected={selectedLocations.has(city)} onClick={() => { toggleLocation(city); setLocSearch('') }}>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                {city}
+                                {selectedLocations.has(city) && <svg className="jb-loc-check" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                              </LocationResultRowButton>
+                            ))}
+                            {LOC_ALL.filter(c => c.toLowerCase().includes(locSearch.toLowerCase())).length === 0 && (
+                              <p className="jb-loc-no-results">No cities found</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

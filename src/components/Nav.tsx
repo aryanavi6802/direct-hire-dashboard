@@ -5,17 +5,30 @@ import { useEffect, useState } from 'react'
 const NAV_LOGO_ICON = '/img/nav/logo_icon.png'
 const NAV_LOGO_WORDMARK = '/img/nav/logo_wordmark.png'
 
+const GLASS_STYLE: React.CSSProperties = {
+  background: 'rgba(255, 255, 255, 0.78)',
+  backdropFilter: 'blur(20px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+  borderBottomColor: 'rgba(15, 23, 42, 0.08)',  // only color transitions, width stays 1px
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',  // same structure as base, only alpha changes
+}
+
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
+    const handleScroll = () => setScrolled(window.scrollY > 40)
+    handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   return (
-    <nav className={`nav${scrolled ? ' scrolled' : ''}`} id="nav">
+    <nav
+      className="nav"
+      id="nav"
+      style={scrolled ? GLASS_STYLE : undefined}
+    >
       <a href="#" className="nav-brand">
         <img className="nav-brand-icon" src={NAV_LOGO_ICON} alt="JobNova icon" />
         <img className="nav-brand-wordmark" src={NAV_LOGO_WORDMARK} alt="JobNova" />
