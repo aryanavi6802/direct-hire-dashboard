@@ -403,3 +403,51 @@
   --btn-ghost-color:            var(--color-text-default);
   --btn-ghost-hover-bg:         var(--color-surface-muted);
 }
+
+/* ─────────────────────────────────────────
+   DARK MODE COLOR OVERRIDES
+   ───────────────────────────────────────── */
+[data-theme="dark"] {
+  /* Surface / Background Overrides */
+  --color-bg: #09090b;                /* page background is solid dark gray/black */
+  --color-surface: #121214;           /* panel card backgrounds */
+  --color-surface-muted: #1e1e24;     /* slightly lighter grey for toggles */
+  --color-surface-subtle: #17171a;    /* near-black for subelements */
+  --color-nav-bg: rgba(9, 9, 11, 0.85);/* frosted-glass dark nav */
+  --color-bg-light: #161c0d;          /* brand-tinted dark surface */
+  --color-bg-neutral: #17171a;
+
+  /* Typography / Text Overrides */
+  --color-text-default: #f3f4f6;       /* primary text is near-white */
+  --color-text-second: #a1a1aa;        /* secondary text is medium grey */
+  --color-text-second-2: #71717a;      /* tertiary / muted text is darker grey */
+  --color-text-white: #ffffff;
+  --color-text-on-green: #ffffff;
+
+  /* Borders / Dividers */
+  --color-ui-border: #27272a;         /* inputs border */
+  --color-ui-border-focus: #52525b;
+  --color-ui-border-filled: #3f3f46;
+  --color-border-light: rgba(255, 255, 255, 0.08);
+  --color-border-default: #222225;
+
+  /* Custom overlays & alpha values */
+  --color-white-alpha-72: rgba(255, 255, 255, 0.9);
+  --color-white-alpha-60: rgba(255, 255, 255, 0.6);
+  --color-white-alpha-55: rgba(255, 255, 255, 0.55);
+  --color-white-alpha-50: rgba(255, 255, 255, 0.50);
+  --color-white-alpha-18: rgba(255, 255, 255, 0.12);
+  --color-white-alpha-12: rgba(255, 255, 255, 0.08);
+  --color-white-alpha-10: rgba(255, 255, 255, 0.06);
+
+  --color-dark-alpha-65: rgba(255, 255, 255, 0.85);
+  --color-dark-alpha-55: rgba(255, 255, 255, 0.7);
+  --color-dark-alpha-45: rgba(255, 255, 255, 0.55);
+
+  --color-overlay-08: rgba(255, 255, 255, 0.08);
+  --color-overlay-12: rgba(255, 255, 255, 0.12);
+
+  /* Adjust hero & visual elements */
+  --gradient-hero-glow: radial-gradient(ellipse at 60% 40%, rgba(176,248,9,0.1) 0%, transparent 75%);
+  --btn-ghost-hover-bg: rgba(255, 255, 255, 0.08);
+}
