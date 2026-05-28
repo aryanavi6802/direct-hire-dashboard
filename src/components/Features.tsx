@@ -187,8 +187,152 @@ export default function Features() {
                     src={f.lottie}
                     className="features-lottie"
                   />
+                ) : f.id === 'agent' ? (
+                  <div className="features-preview-card features-preview-card--agent">
+                    <div className="fp-agent">
+                      <div className="fp-agent-header">
+                        <div className="fp-agent-avatar">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 8V4H8"/><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M2 12h20"/><path d="M12 2v20"/></svg>
+                        </div>
+                        <div className="fp-agent-meta">
+                          <span className="fp-agent-name">Nova AI Agent</span>
+                          <span className="fp-agent-status"><span className="fp-agent-dot" />Always active</span>
+                        </div>
+                      </div>
+                      <div className="fp-agent-chat">
+                        <div className="fp-agent-bubble fp-agent-bubble--bot">
+                          <p>Found 12 new positions matching your profile. 3 are from companies you follow.</p>
+                        </div>
+                        <div className="fp-agent-bubble fp-agent-bubble--bot fp-agent-bubble--highlight">
+                          <p>🎯 High match: <strong>Senior Frontend Engineer</strong> at Linear — 92% fit</p>
+                        </div>
+                        <div className="fp-agent-bubble fp-agent-bubble--user">
+                          <p>Apply to the top 5 matches</p>
+                        </div>
+                        <div className="fp-agent-bubble fp-agent-bubble--bot fp-agent-typing">
+                          <span /><span /><span />
+                        </div>
+                      </div>
+                      <div className="fp-agent-tasks">
+                        <div className="fp-agent-task fp-agent-task--done"><span className="fp-agent-task-check">✓</span>Scanned 2,400 listings</div>
+                        <div className="fp-agent-task fp-agent-task--done"><span className="fp-agent-task-check">✓</span>Filtered by preferences</div>
+                        <div className="fp-agent-task fp-agent-task--active"><span className="fp-agent-task-spinner" />Reaching out to recruiters…</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : f.id === 'resume' ? (
+                  <div className="features-preview-card features-preview-card--resume">
+                    <div className="fp-resume">
+                      <div className="fp-resume-doc">
+                        <div className="fp-resume-header-bar">
+                          <div className="fp-resume-name-block">
+                            <div className="fp-resume-avatar-sm" />
+                            <div>
+                              <div className="fp-resume-line fp-resume-line--name" />
+                              <div className="fp-resume-line fp-resume-line--role" />
+                            </div>
+                          </div>
+                          <div className="fp-resume-ats-badge">ATS Score: 96%</div>
+                        </div>
+                        <div className="fp-resume-section">
+                          <div className="fp-resume-section-title">Experience</div>
+                          <div className="fp-resume-line fp-resume-line--long" />
+                          <div className="fp-resume-line fp-resume-line--med" />
+                          <div className="fp-resume-line fp-resume-line--long" />
+                        </div>
+                        <div className="fp-resume-section">
+                          <div className="fp-resume-section-title">Skills</div>
+                          <div className="fp-resume-skills">
+                            <span className="fp-resume-skill fp-resume-skill--match">React</span>
+                            <span className="fp-resume-skill fp-resume-skill--match">TypeScript</span>
+                            <span className="fp-resume-skill fp-resume-skill--match">Node.js</span>
+                            <span className="fp-resume-skill fp-resume-skill--new">+GraphQL</span>
+                            <span className="fp-resume-skill fp-resume-skill--new">+AWS</span>
+                          </div>
+                        </div>
+                        <div className="fp-resume-keywords">
+                          <div className="fp-resume-keyword-title">✦ AI-Added Keywords</div>
+                          <div className="fp-resume-keyword-list">
+                            <span>CI/CD</span><span>Agile</span><span>REST APIs</span><span>Microservices</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="fp-resume-side">
+                        <div className="fp-resume-score-ring">
+                          <svg viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(176,248,9,0.15)" strokeWidth="6" />
+                            <circle cx="40" cy="40" r="34" fill="none" stroke="#b0f809" strokeWidth="6" strokeDasharray="214" strokeDashoffset="8.5" strokeLinecap="round" className="fp-resume-ring-fill" />
+                          </svg>
+                          <span className="fp-resume-score-text">96%</span>
+                        </div>
+                        <span className="fp-resume-score-label">ATS Optimized</span>
+                        <div className="fp-resume-improvements">
+                          <div className="fp-resume-imp"><span className="fp-resume-imp-icon">↑</span>Added 5 keywords</div>
+                          <div className="fp-resume-imp"><span className="fp-resume-imp-icon">↑</span>Optimized format</div>
+                          <div className="fp-resume-imp"><span className="fp-resume-imp-icon">↑</span>Tailored to role</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
-                  <div className={`features-preview-card features-preview-card--${f.id}`} />
+                  <div className="features-preview-card features-preview-card--auto-apply">
+                    <div className="fp-autoapply">
+                      <div className="fp-aa-header">
+                        <div className="fp-aa-header-left">
+                          <span className="fp-aa-live-dot" />
+                          <span className="fp-aa-title">Auto Apply Active</span>
+                        </div>
+                        <span className="fp-aa-counter">312 applied</span>
+                      </div>
+                      <div className="fp-aa-stream">
+                        <div className="fp-aa-item fp-aa-item--done" style={{animationDelay: '0s'}}>
+                          <div className="fp-aa-item-icon fp-aa-item-icon--done">✓</div>
+                          <div className="fp-aa-item-info">
+                            <span className="fp-aa-item-role">Frontend Engineer</span>
+                            <span className="fp-aa-item-company">Vercel · Just now</span>
+                          </div>
+                          <span className="fp-aa-item-match">94%</span>
+                        </div>
+                        <div className="fp-aa-item fp-aa-item--done" style={{animationDelay: '0.1s'}}>
+                          <div className="fp-aa-item-icon fp-aa-item-icon--done">✓</div>
+                          <div className="fp-aa-item-info">
+                            <span className="fp-aa-item-role">Product Designer</span>
+                            <span className="fp-aa-item-company">Figma · 3m ago</span>
+                          </div>
+                          <span className="fp-aa-item-match">91%</span>
+                        </div>
+                        <div className="fp-aa-item fp-aa-item--active" style={{animationDelay: '0.2s'}}>
+                          <div className="fp-aa-item-icon fp-aa-item-icon--active"><span className="fp-aa-spinner" /></div>
+                          <div className="fp-aa-item-info">
+                            <span className="fp-aa-item-role">React Developer</span>
+                            <span className="fp-aa-item-company">Stripe · Applying…</span>
+                          </div>
+                          <span className="fp-aa-item-match">88%</span>
+                        </div>
+                        <div className="fp-aa-item fp-aa-item--queued" style={{animationDelay: '0.3s'}}>
+                          <div className="fp-aa-item-icon fp-aa-item-icon--queued">⏳</div>
+                          <div className="fp-aa-item-info">
+                            <span className="fp-aa-item-role">UI Engineer</span>
+                            <span className="fp-aa-item-company">Notion · Queued</span>
+                          </div>
+                          <span className="fp-aa-item-match">85%</span>
+                        </div>
+                        <div className="fp-aa-item fp-aa-item--queued" style={{animationDelay: '0.4s'}}>
+                          <div className="fp-aa-item-icon fp-aa-item-icon--queued">⏳</div>
+                          <div className="fp-aa-item-info">
+                            <span className="fp-aa-item-role">Full Stack Dev</span>
+                            <span className="fp-aa-item-company">Railway · Queued</span>
+                          </div>
+                          <span className="fp-aa-item-match">82%</span>
+                        </div>
+                      </div>
+                      <div className="fp-aa-stats">
+                        <div className="fp-aa-stat"><strong>12</strong><span>Today</span></div>
+                        <div className="fp-aa-stat"><strong>312</strong><span>Total</span></div>
+                        <div className="fp-aa-stat"><strong>87%</strong><span>Avg Match</span></div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
